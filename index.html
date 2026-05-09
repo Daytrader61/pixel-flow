@@ -2,260 +2,238 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Pixel Flow</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:#0d1b3e;color:#fff;font-family:system-ui,sans-serif;
-  display:flex;flex-direction:column;align-items:center;min-height:100vh;
-  padding:8px;user-select:none;-webkit-user-select:none;touch-action:manipulation
-}
-h1{font-size:22px;margin:10px 0;color:#64b5f6}
-#info{display:flex;gap:20px;align-items:center;margin-bottom:8px;font-size:14px}
-#levelBadge{background:#1565c0;padding:4px 14px;border-radius:12px;font-weight:700}
-canvas{border-radius:12px;background:#0a1228;max-width:100%}
-#slots{display:flex;gap:8px;margin:8px 0}
-.slot{
-  width:44px;height:36px;border-radius:8px;background:#0a1228;border:2px solid #1e3a5f;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px
-}
-.slot.filled{border-color:#42a5f5;background:#111d38}
-#supply{display:flex;gap:10px;margin:6px 0;flex-wrap:wrap;justify-content:center}
-.capsule{
-  width:48px;height:60px;border-radius:14px 14px 18px 18px;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-  font-weight:800;font-size:14px;position:relative;box-shadow:0 3px 0 rgba(0,0,0,.5)
-}
-.capsule::after{content:'';position:absolute;top:3px;left:8px;right:8px;height:10px;background:rgba(255,255,255,.25);border-radius:8px}
-.capsule .cnt{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;border:1px solid rgba(255,255,255,.2)}
-.capsule.empty{opacity:.2;pointer-events:none}
-#btns{display:flex;gap:10px;margin:8px 0}
-.btn{
-  width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.2);
-  background:radial-gradient(circle at 30% 25%,#64b5f6,#1565c0);
-  cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 3px 0 #0d47a1
-}
-.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0d47a1}
-#msg{text-align:center;font-size:13px;color:#90caf9;min-height:20px;margin:4px 0}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,sans-serif;background:#0d1b3e;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;user-select:none;touch-action:manipulation;padding:10px}
+
+#menu{display:flex;flex-direction:column;align-items:center;width:100%;max-width:400px}
+#menu h1{font-size:24px;margin:16px 0;background:linear-gradient(180deg,#90caf9,#42a5f5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#levels{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0;max-width:360px}
+.lv{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#42a5f5,#1565c0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 2px 0 #0d47a1,0 0 12px rgba(66,165,245,.2);transition:.1s}
+.lv:active{transform:scale(.82)}
+.lv.done{background:linear-gradient(135deg,#66bb6a,#388e3c);box-shadow:0 2px 0 #1b5e20,0 0 12px rgba(102,187,106,.2)}
+.lv.locked{background:#2a2a3a;box-shadow:none;opacity:.35;pointer-events:none}
+.play{width:100%;padding:14px;margin:12px 0;background:linear-gradient(180deg,#fff176,#f9a825);color:#111;font-weight:900;font-size:18px;border-radius:40px;cursor:pointer;border:3px solid #000;box-shadow:0 4px 0 #c49000;text-align:center}
+
+#game{display:none;flex-direction:column;align-items:center;width:100%;max-width:400px}
+.bar{display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 0}
+.bar .ico{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#42a5f5,#1565c0);border:2px solid rgba(255,255,255,.15);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 #0d47a1}
+.bar .tag{background:#1565c0;padding:5px 14px;border-radius:14px;font-weight:700;font-size:12px}
+.bar .cn{color:#ffd700;font-weight:700;font-size:13px}
+#c{max-width:100%;border-radius:12px;background:#0a1228;margin:8px 0}
+#slots,#supply{display:flex;gap:8px;margin:6px 0;justify-content:center;flex-wrap:wrap}
+.sl{width:44px;height:36px;border-radius:8px;background:#0a1228;border:2px solid #1e3a5f;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+.sl.full{background:#111d38;border-color:#42a5f5}
+.cap{width:48px;height:60px;border-radius:14px 14px 18px 18px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;position:relative;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.cap::after{content:'';position:absolute;top:3px;left:8px;right:8px;height:10px;background:rgba(255,255,255,.25);border-radius:8px}
+.cap .ct{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;border:1px solid rgba(255,255,255,.15);white-space:nowrap}
+.cap.done{opacity:.15;pointer-events:none}
+.btns{display:flex;gap:10px;margin:6px 0}
+.btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:radial-gradient(circle at 30% 25%,#64b5f6,#1565c0);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 #0d47a1}
+.btn:active{transform:translateY(2px)}
+#msg{color:#90caf9;font-size:12px;min-height:18px;text-align:center}
 </style>
 </head>
 <body>
-<h1>🐰 PIXEL FLOW</h1>
-<div id="info">
-  <span id="levelBadge">Level 1</span>
-  <span>🪙 <span id="coins">0</span></span>
-  <span>🎯 <span id="remaining">0</span></span>
+
+<div id="menu">
+  <h1>🐰 PIXEL FLOW</h1>
+  <div id="levels"></div>
+  <div class="play" id="playBtn">▶ SPIELEN</div>
 </div>
-<canvas id="c"></canvas>
-<div id="slots"></div>
-<div id="supply"></div>
-<div id="btns">
-  <button class="btn" onclick="undo()">↩</button>
-  <button class="btn" onclick="reset()">🔄</button>
+
+<div id="game">
+  <div class="bar">
+    <div class="ico" onclick="goMenu()">◀</div>
+    <div class="tag" id="lvTag">Level 1</div>
+    <div class="cn">🪙 <span id="cnDisp">0</span></div>
+  </div>
+  <canvas id="c"></canvas>
+  <div id="slots"></div>
+  <div id="supply"></div>
+  <div class="btns">
+    <div class="btn" onclick="undo()">↩</div>
+    <div class="btn" onclick="reset()">🔄</div>
+  </div>
+  <div id="msg"></div>
 </div>
-<div id="msg"></div>
 
 <script>
+// ===== DATA =====
 const P=['#f06292','#66bb6a','#42a5f5','#ffa726','#ab47bc','#fff176','#4dd0e1','#ef5350'];
-const BG='#0a1228';
 const BM=5;
-let levels=[],state={lv:0,grid:[],supply:[],belt:[],slots:[null,null,null,null,null],coins:0,completed:{},hist:[],clock:0,CELL:0};
+let LV=[];
+(function gen(){
+  for(let i=0;i<100;i++){
+    let sz=i<10?5:i<25?6:i<45?7:i<70?8:9;
+    let nc=Math.min(2+Math.floor(i/15),6);
+    let p=Array.from({length:sz},()=>Array(sz).fill(-1));
+    let cl=shuffle([...Array(8).keys()]).slice(0,nc);
+    cl.forEach(ci=>{
+      let blob=4+Math.floor(Math.random()*sz*sz/nc);
+      let r=rnd(sz),c=rnd(sz);
+      for(let b=0;b<blob;b++){
+        if(p[r][c]===-1)p[r][c]=ci;
+        let d=[[0,1],[0,-1],[1,0],[-1,0]][rnd(4)];
+        let nr=r+d[0],nc=c+d[1];if(nr>=0&&nr<sz&&nc>=0&&nc<sz){r=nr;c=nc}
+      }
+    });
+    let sp=[];cl.forEach(ci=>{let nd=0;p.forEach(r=>r.forEach(v=>{if(v===ci)nd++}));sp.push({c:ci,a:nd+2+rnd(4)});});
+    LV.push({sz,p,sp,cl});
+  }
+  function rnd(n){return Math.floor(Math.random()*n)}
+  function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=rnd(i+1);[b[i],b[j]]=[b[j],b[i]]}return b}
+})();
 
-// Generate levels
-for(let i=0;i<120;i++){
-  let sz=i<8?5:i<18?6:i<35?7:i<60?8:i<85?9:10;
-  let nc=i<6?2:i<15?3:i<30?4:i<55?5:6;
-  let p=Array.from({length:sz},()=>Array(sz).fill(-1));
-  let cl=shuffle([...Array(8).keys()]).slice(0,nc);
-  cl.forEach(ci=>{
-    let blob=4+rnd(sz*sz/nc);
-    let r=rnd(sz),c=rnd(sz);
-    for(let b=0;b<blob;b++){
-      if(p[r][c]===-1)p[r][c]=ci;
-      let d=[[0,1],[0,-1],[1,0],[-1,0]][rnd(4)];
-      let nr=r+d[0],nc=c+d[1];if(nr>=0&&nr<sz&&nc>=0&&nc<sz){r=nr;c=nc}
-    }
-  });
-  let su=[];cl.forEach(ci=>{let n=0;p.forEach(r=>r.forEach(v=>{if(v===ci)n++}));su.push({c:ci,a:n+2+rnd(4)});});
-  levels.push({sz,p,su,cl});
+let S={lv:0,grid:[],supply:[],belt:[],slots:[null,null,null,null,null],coins:0,com:{},hist:[],clock:0,CL:0,raf:null};
+
+// Load/save
+try{let c=localStorage.getItem('pfz');if(c)S.com=JSON.parse(c);let n=localStorage.getItem('pfzn');if(n)S.coins=parseInt(n)||0}catch(e){}
+function sv(){try{localStorage.setItem('pfz',JSON.stringify(S.com));localStorage.setItem('pfzn',''+S.coins)}catch(e){}}
+
+// Menu
+function buildMenu(){
+  let g=document.getElementById('levels'),html='',best=0;
+  for(let i=99;i>=0;i--){if(S.com[i]){best=i;break}}
+  for(let i=0;i<30;i++){
+    let cls=S.com[i]?'done':(i>0&&!S.com[i-1]?'locked':'');
+    html+=`<div class="lv ${cls}" onclick="${cls==='locked'?'':"start("+i+")"}">${i+1}</div>`;
+  }
+  g.innerHTML=html;
+  document.getElementById('playBtn').onclick=function(){let l=0;for(let i=99;i>=0;i--){if(S.com[i]){l=Math.min(i+1,99);break}}start(l);};
 }
-function rnd(n){return Math.floor(Math.random()*n)}
-function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=rnd(i+1);[b[i],b[j]]=[b[j],b[i]]}return b}
+function goMenu(){cancelAnimationFrame(S.raf);S.raf=null;document.getElementById('menu').style.display='flex';document.getElementById('game').style.display='none';buildMenu();}
 
-// Load
-try{let c=localStorage.getItem('pf9c');if(c)state.completed=JSON.parse(c);let n=localStorage.getItem('pf9n');if(n)state.coins=parseInt(n)}catch(e){}
-function save(){try{localStorage.setItem('pf9c',JSON.stringify(state.completed));localStorage.setItem('pf9n',''+state.coins)}catch(e){}}
-
+// === GAME ===
 function start(n){
-  state.lv=n;state.hist=[];state.clock=0;
-  let l=levels[n],sz=l.sz;
-  state.CELL=Math.floor((Math.min(window.innerWidth-32,380))/sz);
+  S.lv=n;S.hist=[];S.clock=0;let l=LV[n],sz=l.sz;
+  S.CL=Math.floor((Math.min(window.innerWidth-32,380))/sz);
   let cv=document.getElementById('c');
-  cv.width=sz*state.CELL+80;cv.height=sz*state.CELL+80;
-  state.grid=l.p.map(r=>[...r]);state.belt=[];state.slots=[null,null,null,null,null];
-  state.supply=l.su.map(s=>({c:s.c,a:s.a}));
-  render();requestAnimationFrame(loop);
+  cv.width=sz*S.CL+80;cv.height=sz*S.CL+80;
+  S.grid=l.p.map(r=>[...r]);S.belt=[];S.slots=[null,null,null,null,null];
+  S.supply=l.sp.map(s=>({c:s.c,a:s.a}));
+  document.getElementById('menu').style.display='none';
+  document.getElementById('game').style.display='flex';
+  render();S.raf=requestAnimationFrame(loop);
 }
 
-let raf;
 function loop(){
-  let l=levels[state.lv],sz=l.sz;
-  state.clock+=.01;if(state.clock>1)state.clock-=1;
-  // Belt bunnies auto-shoot
-  state.belt.forEach(b=>{
+  let l=LV[S.lv],sz=l.sz;S.clock+=.01;if(S.clock>1)S.clock-=1;
+  S.belt.forEach(b=>{
     b.cd=Math.max(0,b.cd-16);
     if(b.a>0&&b.cd<=0){
-      let best=null,bA=1e9,bAng=b.pos*Math.PI*2+state.clock*Math.PI*2;
-      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(state.grid[r][c]===b.c){
+      let best=null,bA=1e9,bAng=b.pos*Math.PI*2+S.clock*Math.PI*2;
+      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(S.grid[r][c]===b.c){
         let ta=Math.atan2(r-sz/2+.5,c-sz/2+.5);
         let df=Math.abs(((bAng-ta+Math.PI*3)%(Math.PI*2))-Math.PI);
         if(df<bA&&df<.5){bA=df;best={r,c};}
       }
-      if(best){state.grid[best.r][best.c]=-1;b.a--;b.cd=300;b.hit=best;}
+      if(best&&bA<.4){S.grid[best.r][best.c]=-1;b.a--;b.cd=280;b.hit=best;}
     }
   });
-  // Remove dead, move to slots
-  for(let i=state.belt.length-1;i>=0;i--){
-    let b=state.belt[i];
-    if(b.a<=0){state.belt.splice(i,1);continue}
-    if(b.pos>.9){let si=state.slots.indexOf(null);if(si!==-1){let b2=state.belt.splice(i,1)[0];state.slots[si]={c:b2.c,a:b2.a};}}
+  for(let i=S.belt.length-1;i>=0;i--){
+    let b=S.belt[i];if(b.a<=0){S.belt.splice(i,1);continue}
+    if(b.pos>.9){let si=S.slots.indexOf(null);if(si!==-1){let b2=S.belt.splice(i,1)[0];S.slots[si]={c:b2.c,a:b2.a};}}
   }
   draw();render();
-  if(checkWin()){save();msg('🎉 Level '+(state.lv+1)+' geschafft! +10 🪙');return;}
-  raf=requestAnimationFrame(loop);
+  if(cw())return;
+  S.raf=requestAnimationFrame(loop);
 }
 
 function draw(){
-  let l=levels[state.lv],sz=l.sz,cv=document.getElementById('c');
-  let ctx=cv.getContext('2d'),C=state.CELL;
-  let ox=(cv.width-sz*C)/2,oy=(cv.height-sz*C)/2;
+  let l=LV[S.lv],sz=l.sz,cv=document.getElementById('c');
+  let ctx=cv.getContext('2d'),C=S.CL,ox=(cv.width-sz*C)/2,oy=(cv.height-sz*C)/2;
   ctx.clearRect(0,0,cv.width,cv.height);
   let cx=ox+sz*C/2,cy=oy+sz*C/2,bR=sz*C/2+20;
   
-  // Belt ring
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=8;
-  ctx.beginPath();ctx.arc(cx,cy,bR,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='#42a5f5';ctx.lineWidth=2;
-  ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(cx,cy,bR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  // Belt
+  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=8;ctx.beginPath();ctx.arc(cx,cy,bR,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#42a5f5';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(cx,cy,bR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
   
-  // Grid cells
+  // Grid
   for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){
-    let x=ox+c*C,y=oy+r*C,v=state.grid[r][c];
-    if(v>=0){ctx.fillStyle=P[v];ctx.fillRect(x+1,y+1,C-2,C-2);ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(x+1,y+1,C-2,3);}
-    else ctx.fillStyle=BG,ctx.fillRect(x+1,y+1,C-2,C-2);
+    let x=ox+c*C,y=oy+r*C,v=S.grid[r][c];
+    if(v>=0){ctx.fillStyle=P[v];ctx.fillRect(x+1,y+1,C-2,C-2);ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(x+1,y+1,C-2,3);}
+    else{ctx.fillStyle='#0a1228';ctx.fillRect(x+1,y+1,C-2,C-2);}
     ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.5;ctx.strokeRect(x,y,C,C);
   }
   
-  // Bunnies on belt
-  state.belt.forEach(b=>{
-    let ang=b.pos*Math.PI*2+state.clock*Math.PI*2;
-    let bx=cx+Math.cos(ang)*bR,by=cy+Math.sin(ang)*bR;
-    // Body
+  // Bunnies
+  S.belt.forEach(b=>{
+    let ang=b.pos*Math.PI*2+S.clock*Math.PI*2,bx=cx+Math.cos(ang)*bR,by=cy+Math.sin(ang)*bR;
     ctx.fillStyle=P[b.c];ctx.beginPath();ctx.arc(bx,by,8,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.arc(bx-1,by-2,3,0,Math.PI*2);ctx.fill();
-    // Ears
     ctx.fillStyle=P[b.c];ctx.fillRect(bx-3,by-12,3,8);ctx.fillRect(bx+1,by-12,3,8);
     ctx.fillStyle='#ffb6c1';ctx.fillRect(bx-2,by-10,1.5,4);ctx.fillRect(bx+2,by-10,1.5,4);
-    // Eyes
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx-2,by-1,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(bx+3,by-1,2,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#000';ctx.beginPath();ctx.arc(bx-1.5,by-1,1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(bx+3.5,by-1,1,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#ff69b4';ctx.beginPath();ctx.arc(bx,by+2,1.5,0,Math.PI*2);ctx.fill();
-    // Ammo
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(bx-10,by-22,20,13,6);ctx.fill();
-    ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(b.a,bx,by-12);
-    // Hit effect
-    if(b.hit&&b.cd>200){
-      let tx=ox+b.hit.c*C+C/2,ty=oy+b.hit.r*C+C/2;
-      ctx.strokeStyle=P[b.c]+'80';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx,ty);ctx.stroke();
-      ctx.fillStyle='#fff';ctx.fillRect(tx-2,ty-2,4,4);
-    }
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(bx-10,by-22,20,13,6);ctx.fill();ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(b.a,bx,by-12);
+    if(b.hit&&b.cd>200){let tx=ox+b.hit.c*C+C/2,ty=oy+b.hit.r*C+C/2;ctx.strokeStyle=P[b.c]+'80';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx,ty);ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(tx-2,ty-2,4,4);}
   });
 }
 
-// Reattach slot+supply events after render
-function reAttach(){
-  document.querySelectorAll('#slots .slot').forEach(function(el,i){
-    el.onclick=function(){slotTap(i);};
-  });
-  document.querySelectorAll('#supply .capsule').forEach(function(el,i){
-    el.onclick=function(){supplyTap(i);};
-  });
-}
 function render(){
-  document.getElementById('levelBadge').textContent='Level '+(state.lv+1);
-  document.getElementById('coins').textContent=state.coins;
-  let rem=0;state.grid.forEach(r=>r.forEach(v=>{if(v>=0)rem++}));
-  document.getElementById('remaining').textContent=rem;
+  document.getElementById('lvTag').textContent='Level '+(S.lv+1);
+  document.getElementById('cnDisp').textContent=S.coins;
   
-  // Clear old events
-  let sr=document.getElementById('slots');
-  sr.replaceChildren();
-  state.slots.forEach(function(s,i){
-    if(s)return`<div class="slot filled" style="background:${P[s.c]};color:${P[s.c]}" onclick="slotTap(${i})">🐰</div>`;
-    return`<div class="slot" onclick="slotTap(${i})" style="color:#1e3a5f">+</div>`;
-  }).join('');
-  
-  // Supply
-  let su=document.getElementById('supply');
-  su.replaceChildren();
-  state.supply.forEach(function(s,i){
+  let sr=document.getElementById('slots');sr.innerHTML='';
+  S.slots.forEach(function(s,i){
     var el=document.createElement('div');
-    el.className='capsule'+(s.a<=0?' empty':'');
-    el.style.background=P[s.c];
-    el.innerHTML='<div class="cnt">'+s.a+'</div>🐰';
-    el.onclick=function(){supplyTap(i);};
-    su.appendChild(el);
+    el.className='sl'+(s?' full':'');
+    el.innerHTML=s?'🐰':'+';
+    el.onclick=function(){slotTap(i);};
+    sr.appendChild(el);
   });
-  reAttach();
+  
+  let sp=document.getElementById('supply');sp.innerHTML='';
+  S.supply.forEach(function(s,i){
+    var el=document.createElement('div');
+    el.className='cap'+(s.a<=0?' done':'');
+    el.style.background=P[s.c];
+    el.innerHTML='<div class="ct">'+s.a+'</div>🐰';
+    el.onclick=function(){supplyTap(i);};
+    sp.appendChild(el);
+  });
 }
 
 function supplyTap(i){
-  let s=state.supply[i];if(!s||s.a<=0)return;
-  if(state.belt.length>=BM){msg('🛑 Band voll!');return}
-  s.a--;state.belt.push({c:s.c,a:s.a>0?s.a:1,pos:.05+rnd(10)/100,cd:0});
-  if(s.a<=0)state.supply.splice(i,1);
-  saveHist();render();
+  let s=S.supply[i];if(!s||s.a<=0)return;
+  if(S.belt.length>=BM){msg('🛑 Band voll ('+BM+' max)!');return}
+  s.a--;S.belt.push({c:s.c,a:s.a>0?s.a:1,pos:.05+Math.random()*.05,cd:0});
+  if(s.a<=0)S.supply.splice(i,1);saveH();render();
 }
 function slotTap(i){
-  let s=state.slots[i];if(!s)return;
-  if(state.belt.length>=BM){msg('🛑 Band voll!');return}
-  state.belt.push({c:s.c,a:s.a,pos:.05+rnd(10)/100,cd:0});state.slots[i]=null;
-  saveHist();render();
+  let s=S.slots[i];if(!s)return;
+  if(S.belt.length>=BM){msg('🛑 Band voll!');return}
+  S.belt.push({c:s.c,a:s.a,pos:.05+Math.random()*.05,cd:0});S.slots[i]=null;
+  saveH();render();
 }
-
-// Tap canvas anywhere = send from supply
 document.getElementById('c').addEventListener('click',function(){
-  let av=state.supply.findIndex(function(s){return s.a>0;});
-  if(av!==-1){supplyTap(av);return;}
-  let sl=state.slots.findIndex(function(s){return s!==null;});
-  if(sl!==-1){slotTap(sl);}
+  let av=S.supply.findIndex(function(s){return s.a>0;});
+  if(av!==-1){supplyTap(av);return}
+  let sl=S.slots.findIndex(function(s){return s!==null;});
+  if(sl!==-1)slotTap(sl);
 });
 
-function saveHist(){
-  state.hist.push({g:state.grid.map(r=>[...r]),b:JSON.parse(JSON.stringify(state.belt)),sl:[...state.slots],su:JSON.parse(JSON.stringify(state.supply))});
-  if(state.hist.length>20)state.hist.shift();
+function saveH(){
+  S.hist.push({g:S.grid.map(r=>[...r]),b:JSON.parse(JSON.stringify(S.belt)),sl:[...S.slots],sp:JSON.parse(JSON.stringify(S.supply))});
+  if(S.hist.length>20)S.hist.shift();
 }
-function undo(){if(!state.hist.length)return;let p=state.hist.pop();state.grid=p.g;state.belt=p.b;state.slots=p.sl;state.supply=p.su;render();msg('↩ Rückgängig');}
-function reset(){
-  state.hist=[];let l=levels[state.lv];state.grid=l.p.map(r=>[...r]);state.belt=[];state.slots=[null,null,null,null,null];
-  state.supply=l.su.map(s=>({c:s.c,a:s.a}));render();msg('🔄 Zurückgesetzt');
+function undo(){if(!S.hist.length)return;let p=S.hist.pop();S.grid=p.g;S.belt=p.b;S.slots=p.sl;S.supply=p.sp;render();msg('↩ Rückgängig');}
+function reset(){S.hist=[];let l=LV[S.lv];S.grid=l.p.map(r=>[...r]);S.belt=[];S.slots=[null,null,null,null,null];S.supply=l.sp.map(s=>({c:s.c,a:s.a}));render();msg('🔄 Zurückgesetzt');}
+function cw(){
+  for(let r of S.grid)for(let v of r)if(v>=0)return false;
+  S.com[S.lv]=true;S.coins+=10;sv();cancelAnimationFrame(S.raf);
+  let n=S.lv+1;setTimeout(function(){if(n>=100){goMenu();msg('🏆 Alle Level!');return}S.com[n]=true;sv();start(n);},1200);
+  msg('🎉 Level befreit! +10 🪙');return true;
 }
-function checkWin(){
-  if(state.belt.some(b=>b.a>0))return false;
-  if(state.slots.some(s=>s&&s.a>0))return false;
-  for(let r of state.grid)for(let v of r)if(v>=0)return false;
-  state.completed[state.lv]=true;state.coins+=10;save();
-  cancelAnimationFrame(raf);
-  let n=state.lv+1;if(n>=120)return msg('🏆 Alle Level!'),true;
-  setTimeout(()=>start(n),1500);
-  return true;
-}
-function msg(t){document.getElementById('msg').textContent=t;setTimeout(()=>document.getElementById('msg').textContent='',2000);}
+function msg(t){var el=document.getElementById('msg');el.textContent=t;setTimeout(function(){el.textContent='';},2000);}
 
-// Start
-start(0);
+// Init
+buildMenu();
 </script>
 </body>
 </html>

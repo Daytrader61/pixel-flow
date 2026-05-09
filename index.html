@@ -9,106 +9,108 @@
 <link rel="manifest" href="manifest.json">
 <title>Pixel Flow</title>
 <style>
-:root{--bg:#0d0220;--chassis:#2d1b4e;--chassis-l:#4a2d7a;--slotbg:#110720;--blue:#2196f3;--gold:#ffd700}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
-  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-  background:linear-gradient(180deg,#0d0220,#1a0a2e 40%,#2d1050 80%,#0d0220);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:linear-gradient(180deg,#0a0016,#150530 40%,#250a50 80%,#0a0016);
   color:#fff;min-height:100vh;display:flex;flex-direction:column;
   user-select:none;-webkit-user-select:none;overflow-x:hidden;touch-action:manipulation
 }
 main{flex:1;display:flex;flex-direction:column;max-width:460px;margin:0 auto;width:100%;padding:6px}
 
 /* Menu */
-#menuView{display:flex;flex-direction:column;align-items:center;padding:24px 8px}
-#menuView h2{font-size:26px;font-weight:800;margin-bottom:20px;
-  background:linear-gradient(180deg,#e0b0ff,#7b68ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.lvl-list{width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;max-height:50vh;overflow-y:auto;padding:8px 0}
-.lvl-node{
-  width:48px;height:48px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-  background:linear-gradient(135deg,#2196f3,#0d47a1);display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:14px;color:#fff;cursor:pointer;box-shadow:0 0 16px rgba(33,150,243,.3)
+#menuView{display:none;flex-direction:column;align-items:center;padding:20px 8px}
+#menuView h2{font-size:24px;font-weight:800;margin-bottom:16px;
+  background:linear-gradient(180deg,#e0b0ff,#7b68ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.lvl-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:380px;padding:8px}
+.lvl-dot{
+  width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#0d47a1);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;
+  cursor:pointer;box-shadow:0 0 14px rgba(33,150,243,.25);transition:.1s
 }
-.lvl-node:active{transform:scale(.88)}
-.lvl-node.done{background:linear-gradient(135deg,#4caf50,#2e7d32);box-shadow:0 0 16px rgba(76,175,80,.3)}
-.lvl-node.locked{background:linear-gradient(135deg,#444,#222);box-shadow:none;opacity:.4;pointer-events:none}
-.lvl-conn{width:3px;height:16px;background:linear-gradient(180deg,#ffd700,#ff8f00);border-radius:2px;margin:0 auto}
-.play-big{
-  padding:15px 50px;background:linear-gradient(180deg,#ffeb3b,#f9a825);color:#000;
-  font-weight:900;font-size:19px;border-radius:50px;cursor:pointer;
-  border:3px solid #000;box-shadow:0 4px 0 #b8860b,0 8px 20px rgba(255,235,59,.2);margin-top:16px
+.lvl-dot:active{transform:scale(.85)}
+.lvl-dot.done{background:linear-gradient(135deg,#4caf50,#2e7d32);box-shadow:0 0 14px rgba(76,175,80,.3)}
+.lvl-dot.locked{background:linear-gradient(135deg,#444,#222);box-shadow:none;opacity:.35;pointer-events:none}
+.play-b{
+  padding:14px 44px;background:linear-gradient(180deg,#ffeb3b,#f9a825);color:#000;
+  font-weight:900;font-size:18px;border-radius:40px;cursor:pointer;
+  border:3px solid #000;box-shadow:0 4px 0 #b8860b,0 8px 18px rgba(255,235,59,.2);margin-top:12px
 }
-.play-big:active{transform:translateY(3px);box-shadow:0 1px 0 #b8860b}
+.play-b:active{transform:translateY(3px);box-shadow:0 1px 0 #b8860b}
 
 /* Game */
-#gameView{display:none;flex-direction:column;gap:6px}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:4px}
-.lvl-tag{background:linear-gradient(135deg,#2196f3,#1565c0);padding:5px 14px;border-radius:18px;font-weight:700;font-size:12px}
-.coin{display:flex;align-items:center;gap:3px;font-weight:700;color:#ffd700;font-size:13px}
-.ico{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#1565c0);
-  border:2px solid rgba(255,255,255,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:14px;box-shadow:0 2px 0 #0d47a1}
-.ico:active{transform:scale(.88)}
+#gameView{display:flex;flex-direction:column;gap:6px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:2px 4px}
+.tag{background:linear-gradient(135deg,#2196f3,#1565c0);padding:5px 14px;border-radius:16px;font-weight:700;font-size:11px}
+.coin{display:flex;align-items:center;gap:2px;font-weight:700;color:#ffd700;font-size:12px}
+.ico{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#1565c0);
+  border:2px solid rgba(255,255,255,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;box-shadow:0 2px 0 #0d47a1;transition:.1s}
+.ico:active{transform:scale(.85)}
 
-/* Chassis */
+/* Chassis with belt */
 .chassis{
-  background:linear-gradient(180deg,#2d1b4e,#1a0e30);border-radius:18px;padding:6px;position:relative;
+  background:linear-gradient(180deg,#2d1b4e,#1a0e30);border-radius:18px;padding:8px;
   box-shadow:0 0 0 4px #4a2d7a,0 0 0 7px #2d1b4e,0 10px 30px rgba(0,0,0,.4)
 }
-.chassis-inner{background:#110720;border-radius:10px;padding:3px;position:relative;display:flex;align-items:center;justify-content:center}
-#gameCanvas{border-radius:4px;display:block;max-width:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.chassis-inner{background:#0e0520;border-radius:12px;position:relative;overflow:hidden}
+#gameCanvas{border-radius:6px;display:block;max-width:100%;image-rendering:pixelated}
 
-/* Slots */
-.slots{display:flex;gap:6px;justify-content:center;padding:8px 0 2px;min-height:48px}
+/* Slots (waiting area below grid) */
+.slots-row{display:flex;gap:8px;justify-content:center;padding:6px 0 0;min-height:48px}
 .slot{
-  width:40px;height:40px;border-radius:8px;background:#110720;border:2px solid #3d2a60;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s
+  width:42px;height:42px;border-radius:10px;background:#110720;border:2px solid #3d2a60;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.1s;
+  position:relative
 }
-.slot.filled{border-color:rgba(255,255,255,.25)}
-.slot .blk{width:26px;height:26px;border-radius:5px;box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 0 6px rgba(255,255,255,.12)}
-.slot.sel{border-color:#ffd700!important;box-shadow:0 0 10px rgba(255,215,0,.3)}
+.slot.active{border-color:rgba(255,255,255,.3)}
+.slot .bun{
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;box-shadow:0 2px 0 rgba(0,0,0,.4)
+}
+.slot .ammocount{
+  position:absolute;top:-8px;right:-4px;background:#222;color:#fff;
+  font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;border:1px solid rgba(255,255,255,.2)
+}
 
-/* Ammo */
-.ammo-bar{display:flex;gap:8px;justify-content:center;padding:2px 0;flex-wrap:wrap}
-.ammo-stack{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;transition:.1s}
-.ammo-stack:active{transform:scale(.88)}
-.cap{
-  width:38px;height:46px;border-radius:10px 10px 14px 14px;display:flex;
-  align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;
-  position:relative;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -2px 4px rgba(0,0,0,.3);
-  border:2px solid rgba(255,255,255,.12)
+/* Ammo supply (bunnies waiting to enter) */
+.supply{display:flex;gap:6px;justify-content:center;padding:4px 0;flex-wrap:wrap}
+.supply-bun{
+  width:46px;height:58px;border-radius:14px 14px 18px 18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;
+  color:#fff;position:relative;box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -2px 4px rgba(0,0,0,.3);
+  border:2px solid rgba(255,255,255,.12);transition:.1s
 }
-.cap::after{
-  content:'';position:absolute;top:2px;left:7px;right:7px;height:10px;
-  background:linear-gradient(180deg,rgba(255,255,255,.3),transparent);border-radius:6px
+.supply-bun:active{transform:scale(.88)}
+.supply-bun::after{
+  content:'';position:absolute;top:3px;left:8px;right:8px;height:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.3),transparent);border-radius:8px
 }
-.cap.spent{opacity:.2;pointer-events:none}
-.ammo-lbl{font-size:9px;color:#b39ddb}
+.supply-bun .ammotop{
+  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  background:#222;padding:1px 6px;border-radius:8px;font-size:9px;border:1px solid rgba(255,255,255,.15)
+}
+.supply-bun.spent{opacity:.2;pointer-events:none}
 
-/* Bottom */
-.btm{display:flex;gap:10px;justify-content:center;padding:8px 0}
-.big{
-  width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;font-size:18px;color:#fff;
+/* Bottom bar */
+.btm{display:flex;gap:10px;justify-content:center;padding:6px 0}
+.bigb{
+  width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;font-size:20px;color:#fff;
   border:3px solid rgba(255,255,255,.25);position:relative;
   background:radial-gradient(circle at 30% 25%,#64b5f6,#1565c0);
   box-shadow:0 4px 0 #0d47a1,0 0 18px rgba(33,150,243,.25);transition:.1s
 }
-.big:active{transform:translateY(3px);box-shadow:0 1px 0 #0d47a1}
-.big::after{content:'';position:absolute;top:4px;left:9px;right:9px;height:12px;
+.bigb:active{transform:translateY(3px);box-shadow:0 1px 0 #0d47a1}
+.bigb::after{content:'';position:absolute;top:4px;left:9px;right:9px;height:12px;
   background:linear-gradient(180deg,rgba(255,255,255,.2),transparent);border-radius:50%}
-.big .bdg{
-  position:absolute;bottom:-4px;right:-4px;width:18px;height:18px;border-radius:50%;
-  background:#ff5252;font-size:9px;font-weight:700;display:flex;
-  align-items:center;justify-content:center;border:2px solid #0d0220
-}
 
 /* Win */
 .win-o{
   position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;
-  align-items:center;justify-content:center;z-index:200;animation:f .3s
+  align-items:center;justify-content:center;z-index:200;animation:fi .3s
 }
-@keyframes f{from{opacity:0}to{opacity:1}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
 .win-c{
   background:linear-gradient(180deg,#2d1b4e,#1a0e30);border-radius:22px;
   padding:24px;text-align:center;max-width:280px;width:90%;
@@ -136,116 +138,86 @@ main{flex:1;display:flex;flex-direction:column;max-width:460px;margin:0 auto;wid
 <main>
   <div id="menuView">
     <h2>PIXEL FLOW</h2>
-    <div class="lvl-list" id="levelList"></div>
-    <button class="play-big" onclick="playL()">▶ SPIELEN</button>
+    <div class="lvl-grid" id="levelGrid"></div>
+    <button class="play-b" onclick="startLatest()">▶ SPIELEN</button>
   </div>
 
   <div id="gameView">
     <div class="topbar">
       <button class="ico" onclick="goMenu()">◀</button>
-      <span class="lvl-tag" id="lvlTag">Level 1</span>
+      <span class="tag" id="lvlTag">Level 1</span>
       <div class="coin"><span>🪙</span><span id="coinNum">0</span></div>
     </div>
     <div class="chassis">
       <div class="chassis-inner"><canvas id="gameCanvas"></canvas></div>
     </div>
-    <div class="slots" id="slots"></div>
-    <div class="ammo-bar" id="ammo"></div>
+    <div class="slots-row" id="slotsRow"></div>
+    <div class="supply" id="supplyRow"></div>
     <div class="btm">
-      <button class="big" onclick="shoot()">💥</button>
-      <button class="big" onclick="resetLvl()">🔄</button>
-      <button class="big" onclick="doUndo()">↩</button>
+      <button class="bigb" onclick="resetLvl()">🔄</button>
+      <button class="bigb" onclick="doUndo()">↩</button>
     </div>
   </div>
 </main>
 
 <script>
-// ==================== PIXEL FLOW - BUNNY SHOOTER ====================
+// ==================== PIXEL FLOW - CONVEYOR BELT BUNNIES ====================
 const PAL = ['#e91e63','#4caf50','#2196f3','#ff9800','#9c27b0','#ffeb3b','#00bcd4','#ff5252'];
-const EMPTY = '#110720';
-const GHOST = .18;
-const BUNNY_COUNT = 4; // Bunnies around the grid
+const EMPTY = '#0e0520';
+const BELT_CAPACITY = 5; // Max bunnies on belt at once
+const SHOT_DELAY = 400; // ms between shots
 
 // Generate levels
 let LV=[];
 (function gen(){
   for(let i=0;i<100;i++){
-    let sz = i<10?5:i<25?6:i<45?7:i<70?8:9;
-    let nc = i<8?2:i<20?3:i<40?4:i<65?5:6;
+    let sz = i<8?5:i<18?6:i<35?7:i<60?8:i<80?9:10;
+    let nc = i<6?2:i<15?3:i<30?4:i<55?5:6;
     let p = Array.from({length:sz},()=>Array(sz).fill(-1));
     let clrs = shuf([...Array(PAL.length).keys()]).slice(0,nc);
-    let total = 0;
     clrs.forEach(ci=>{
-      let blob = 2+Math.floor(Math.random()*(sz*sz/nc));
+      let blob = 3+Math.floor(Math.random()*(sz*sz/nc));
       let r=rand(sz),c=rand(sz);
       for(let b=0;b<blob;b++){
-        if(p[r][c]===-1){p[r][c]=ci;total++}
+        if(p[r][c]===-1)p[r][c]=ci;
         let d=[[0,1],[0,-1],[1,0],[-1,0]][rand(4)];
-        let nr=r+d[0],nc=c+d[1];
-        if(nr>=0&&nr<sz&&nc>=0&&nc<sz){r=nr;c=nc}
+        let nr=r+d[0],nc=c+d[1];if(nr>=0&&nr<sz&&nc>=0&&nc<sz){r=nr;c=nc}
       }
     });
-    // Add some noise/extra pixels for harder levels
-    if(i>30){
-      for(let x=0;x<Math.floor(total*.15);x++){
-        let r=rand(sz),c=rand(sz);
-        if(p[r][c]===-1)p[r][c]=clrs[rand(clrs.length)];
-      }
-    }
-    // Ammo: slightly more than needed
-    let ammo={};clrs.forEach(ci=>{let need=countColor(p,ci);ammo[ci]={n:need+1+rand(3)};});
-    LV.push({sz,p,ammo,clrs});
+    // Ammo per bunny
+    let supply=[];clrs.forEach(ci=>{let need=0;p.forEach(r=>r.forEach(v=>{if(v===ci)need++}));supply.push({c:ci,ammo:need+1+rand(3)});});
+    LV.push({sz,p,supply});
   }
   function shuf(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=rand(i+1);[b[i],b[j]]=[b[j],b[i]]}return b}
   function rand(n){return Math.floor(Math.random()*n)}
-  function countColor(g,ci){let n=0;g.forEach(r=>r.forEach(v=>{if(v===ci)n++}));return n}
 })();
 
 // State
 let S={
-  lv:0, grid:[], ammo:{}, slots:[null,null,null,null,null], sel:null,
-  hist:[], coins:0, com:{}, CELL:0,
-  bunnies:[], // [{color, angle, shooting, shotTimer}]
-  shootAnim:null, // {fromX,fromY,toX,toY,color,timer}
+  lv:0, grid:[], supply:[], // bunnies at bottom (supply chain)
+  belt:[], // bunnies ON the belt [{color,ammo,beltPos,targetR,targetC,shotCooldown}]
+  slots:[null,null,null,null,null], // waiting slots
+  coins:0, hist:[], com:{}, CELL:0, beltAngle:0
 };
 
 function ld(){
-  try{
-    let c=localStorage.getItem('pf5c');if(c)S.com=JSON.parse(c);
-    let n=localStorage.getItem('pf5n');if(n)S.coins=parseInt(n)||0;
-  }catch(e){}
-  for(let i=0;i<5;i++)S.com[0]=S.com[0]||false;
+  try{let c=localStorage.getItem('pf6c');if(c)S.com=JSON.parse(c);let n=localStorage.getItem('pf6n');if(n)S.coins=parseInt(n)||0}catch(e){}
 }
-function sv(){try{localStorage.setItem('pf5c',JSON.stringify(S.com));localStorage.setItem('pf5n',''+S.coins)}catch(e){}}
+function sv(){try{localStorage.setItem('pf6c',JSON.stringify(S.com));localStorage.setItem('pf6n',''+S.coins)}catch(e){}}
 
 function startLv(n){
-  S.lv=n;S.hist=[];S.shootAnim=null;
-  let l=LV[n],sz=l.sz;
-  S.CELL=Math.floor((Math.min(window.innerWidth-60,370))/sz);
-  S.grid=l.p.map(r=>[...r]); // Copy pattern (we destroy cells)
-  S.slots=[null,null,null,null,null];S.sel=null;
-  S.ammo={};
-  Object.entries(l.ammo).forEach(([ci,a])=>{S.ammo[ci]={c:parseInt(ci),n:a.n};});
-  // Position bunnies around the grid
-  S.bunnies=initBunnies(sz,l.clrs);
+  S.lv=n;S.hist=[];
+  let l=LV[n], sz=l.sz;
+  S.CELL=Math.floor((Math.min(window.innerWidth-70,380))/sz);
+  S.grid=l.p.map(r=>[...r]);
+  S.supply=l.supply.map(s=>({c:s.c,ammo:s.ammo}));
+  S.belt=[];S.slots=[null,null,null,null,null];S.beltAngle=0;
   document.getElementById('menuView').style.display='none';
   document.getElementById('gameView').style.display='flex';
   let cv=document.getElementById('gameCanvas');
-  cv.width=sz*S.CELL+80; cv.height=sz*S.CELL+80; // Extra space for bunnies
+  cv.width=sz*S.CELL;cv.height=sz*S.CELL;
   render();
-  animLoop();
-}
-
-function initBunnies(sz,clrs){
-  // Place bunnies at compass points around the grid
-  let b=[];
-  for(let i=0;i<clrs.length&&i<4;i++){
-    let ci=clrs[i];
-    // Angle: 0=top, π/2=right, π=bottom, 3π/2=left (rotating)
-    let angle=(i/clrs.length)*Math.PI*2;
-    b.push({color:ci, angle, speed:.008+.002*i, shotTimer:0});
-  }
-  return b;
+  gameLoop();
 }
 
 function goMenu(){
@@ -253,249 +225,259 @@ function goMenu(){
   document.getElementById('gameView').style.display='none';
   buildMenu();
 }
-function playL(){
+function startLatest(){
   let l=0;for(let i=LV.length-1;i>=0;i--){if(S.com[i]){l=Math.min(i+1,LV.length-1);break}}
   startLv(l);
 }
 
-// ===== RENDERING =====
-function draw(){
-  let l=LV[S.lv],sz=l.sz,cv=document.getElementById('gameCanvas');
-  let ctx=cv.getContext('2d'),C=S.CELL;
-  let ox=(cv.width-sz*C)/2, oy=(cv.height-sz*C)/2;
+// ===== GAME LOOP =====
+let loopId;
+function gameLoop(){
+  let l=LV[S.lv], sz=l.sz;
   
-  ctx.clearRect(0,0,cv.width,cv.height);
+  // Move belt bunnies
+  S.beltAngle += .02;
+  if(S.beltAngle > Math.PI*2) S.beltAngle -= Math.PI*2;
   
-  // Draw grid
-  for(let r=0;r<sz;r++){
-    for(let c=0;c<sz;c++){
-      let x=ox+c*C,y=oy+r*C,v=S.grid[r][c];
-      ctx.fillStyle=v>=0?PAL[v]:EMPTY;
-      ctx.fillRect(x+.5,y+.5,C-.8,C-.8);
-      if(v>=0){
-        ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(x+.5,y+.5,C*.35,C*.35);
-      }
-      ctx.strokeStyle='rgba(255,255,255,.025)';ctx.lineWidth=.5;ctx.strokeRect(x+.5,y+.5,C-.8,C-.8);
-    }
-  }
-  
-  // Grid center
-  let cx=ox+sz*C/2, cy=oy+sz*C/2;
-  let r=sz*C/2+30;
-  
-  // Draw bunnies rotating around grid
-  S.bunnies.forEach(b=>{
-    b.angle+=b.speed;if(b.angle>Math.PI*2)b.angle-=Math.PI*2;
-    let bx=cx+Math.cos(b.angle)*r;
-    let by=cy+Math.sin(b.angle)*r;
+  let toRemove=[];
+  S.belt.forEach((b,i)=>{
+    // Move bunny along belt (circular path around grid)
+    b.beltPos = (b.beltPos + .015) % 1;
+    b.shotCooldown -= 16;
     
-    // Bunny body
-    ctx.fillStyle=PAL[b.color];
-    // Body
-    ctx.beginPath();ctx.arc(bx,by,10,0,Math.PI*2);ctx.fill();
-    // Inner
-    ctx.fillStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.arc(bx-2,by-2,5,0,Math.PI*2);ctx.fill();
-    // Ears
-    ctx.fillStyle=PAL[b.color];ctx.fillRect(bx-4,by-16,4,12);ctx.fillRect(bx+1,by-16,4,12);
-    // Eyes
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx-3,by-2,2.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(bx+3,by-2,2.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(bx-2.5,by-2,1.2,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(bx+3.5,by-2,1.2,0,Math.PI*2);ctx.fill();
-    // Nose
-    ctx.fillStyle='#ff69b4';ctx.beginPath();ctx.arc(bx,by+1,2,0,Math.PI*2);ctx.fill();
-    
-    // Find which cell this bunny is closest to (for aiming)
-    let cellR=Math.floor((by-oy)/C), cellC=Math.floor((bx-ox)/C);
-    if(cellR>=0&&cellR<sz&&cellC>=0&&cellC<sz&&S.grid[cellR][cellC]>=0){
-      // Draw crosshair line
-      ctx.strokeStyle=PAL[b.color]+'60';ctx.lineWidth=1;
-      ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(bx,by);
-      ctx.lineTo(ox+cellC*C+C/2,oy+cellR*C+C/2);ctx.stroke();
-      ctx.setLineDash([]);
-    }
-    
-    // Shot timer (cooldown indicator)
-    if(b.shotTimer>0){
-      b.shotTimer-=16;
-      ctx.strokeStyle='#fff';ctx.lineWidth=2;
-      ctx.beginPath();ctx.arc(bx,by,14,(b.shotTimer/500)*Math.PI*2,0);ctx.stroke();
-    }
-  });
-  
-  // Draw shoot animation
-  if(S.shootAnim){
-    let a=S.shootAnim;a.timer-=16;
-    if(a.timer>0){
-      let progress=1-a.timer/300;
-      let px=a.fx+(a.tx-a.fx)*progress;
-      let py=a.fy+(a.ty-a.fy)*progress;
-      ctx.fillStyle=PAL[a.color];ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
-      // Trail
-      ctx.fillStyle=PAL[a.color]+'60';ctx.beginPath();ctx.arc(px-4,py-4,3,0,Math.PI*2);ctx.fill();
-    } else S.shootAnim=null;
-  }
-}
-
-let animId;
-function animLoop(){animId=requestAnimationFrame(()=>{draw();animLoop();});}
-
-// ===== GAMEPLAY =====
-function shoot(){
-  let l=LV[S.lv],sz=l.sz;
-  // Find which bunny is closest to a cell of matching color
-  let cv=document.getElementById('gameCanvas'),C=S.CELL;
-  let ox=(cv.width-sz*C)/2, oy=(cv.height-sz*C)/2;
-  let cx=ox+sz*C/2, cy=oy+sz*C/2;
-  let r=sz*C/2+30;
-  
-  let best=null,bestDist=Infinity;
-  
-  S.bunnies.forEach(b=>{
-    if(S.ammo[b.color]&&S.ammo[b.color].n<=0)return;
-    let bx=cx+Math.cos(b.angle)*r, by=cy+Math.sin(b.angle)*r;
-    
-    // Find matching cell nearest to this bunny
-    for(let row=0;row<sz;row++){
-      for(let col=0;col<sz;col++){
-        if(S.grid[row][col]===b.color){
-          let cellX=ox+col*C+C/2, cellY=oy+row*C+C/2;
-          let dist=Math.hypot(bx-cellX,by-cellY);
-          if(dist<bestDist){
-            bestDist=dist;
-            best={bunny:b,row,col,fromX:bx,fromY:by,toX:cellX,toY:cellY};
+    // Find closest matching pixel
+    if(b.ammo>0 && b.shotCooldown<=0){
+      let best=null, bestDist=Infinity;
+      for(let r=0;r<sz;r++){
+        for(let c=0;c<sz;c++){
+          if(S.grid[r][c]===b.color){
+            // Simple distance to cell
+            let cellAngle = Math.atan2(r-sz/2, c-sz/2);
+            let bunAngle = b.beltPos * Math.PI * 2;
+            let angleDiff = Math.abs(((cellAngle-bunAngle+Math.PI*3)%(Math.PI*2))-Math.PI);
+            let dist = angleDiff;
+            if(dist < bestDist){bestDist=dist; best={r,c};}
           }
         }
       }
+      
+      if(best && bestDist < .8){
+        // Shoot!
+        S.grid[best.r][best.c] = -1;
+        b.ammo--;
+        b.shotCooldown = SHOT_DELAY;
+        b.targetR=best.r; b.targetC=best.c;
+      }
+    }
+    
+    // If no ammo left → remove from belt
+    if(b.ammo <= 0){
+      toRemove.push(i);
     }
   });
   
-  if(!best){tst('Keine passende Farbe!');return}
-  if(best.bunny.shotTimer>0){tst('🐰 Lädt noch...');return}
+  // Remove spent bunnies from belt (reverse order)
+  toRemove.sort((a,b)=>b-a).forEach(i=>S.belt.splice(i,1));
   
-  // Destroy the pixel
-  S.grid[best.row][best.col]=-1;
-  S.ammo[best.bunny.color].n--;
-  best.bunny.shotTimer=500; // .5s cooldown
-  S.shootAnim={fx:best.fromX,fy:best.fromY,tx:best.toX,ty:best.toY,color:best.bunny.color,timer:300};
-  pushH();
-  render();
-  checkWin();
+  draw(); render(); checkWin();
+  
+  loopId = requestAnimationFrame(gameLoop);
 }
 
-function pushH(){
-  S.hist.push({
-    g:S.grid.map(r=>[...r]),
-    ammo:JSON.parse(JSON.stringify(S.ammo)),
-    bunnyInfo:S.bunnies.map(b=>({color:b.color,angle:b.angle,shotTimer:b.shotTimer}))
+// ===== RENDERING =====
+function draw(){
+  let l=LV[S.lv], sz=l.sz, cv=document.getElementById('gameCanvas');
+  let ctx=cv.getContext('2d'), C=S.CELL;
+  
+  ctx.clearRect(0,0,cv.width,cv.height);
+  
+  // Draw grid cells
+  for(let r=0;r<sz;r++){
+    for(let c=0;c<sz;c++){
+      let x=c*C,y=r*C,v=S.grid[r][c];
+      if(v>=0){
+        ctx.fillStyle=PAL[v];
+        ctx.fillRect(x+.5,y+.5,C-.8,C-.8);
+        // Shine
+        ctx.fillStyle='rgba(255,255,255,.08)';
+        ctx.fillRect(x+.5,y+.5,C*.3,C*.3);
+      }
+      ctx.strokeStyle='rgba(255,255,255,.02)';ctx.lineWidth=.5;
+      ctx.strokeRect(x+.5,y+.5,C-.8,C-.8);
+    }
+  }
+  
+  let cx=sz*C/2, cy=sz*C/2;
+  let beltR=Math.max(sz*C/2+20, C*3);
+  
+  // Draw conveyor belt ring
+  ctx.strokeStyle='rgba(74,45,122,.4)';ctx.lineWidth=C*.3;
+  ctx.setLineDash([C*.3,C*.5]);
+  ctx.beginPath();ctx.arc(cx,cy,beltR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  
+  // Draw bunnies on belt
+  S.belt.forEach(b=>{
+    let angle = b.beltPos * Math.PI * 2 + S.beltAngle;
+    let bx = cx + Math.cos(angle)*beltR;
+    let by = cy + Math.sin(angle)*beltR;
+    
+    // Bunny
+    drawBunny(ctx, bx, by, PAL[b.color], b.ammo, false);
+    
+    // Shooting effect
+    if(b.targetR!==undefined && b.shotCooldown > SHOT_DELAY-200){
+      let tx = b.targetC*C+C/2, ty = b.targetR*C+C/2;
+      ctx.strokeStyle=PAL[b.color]+'80';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx,ty);ctx.stroke();
+      // Impact sparkle
+      ctx.fillStyle='rgba(255,255,255,.8)';
+      ctx.fillRect(tx-3,ty-3,6,6);
+    }
   });
-  if(S.hist.length>50)S.hist.shift();
+}
+
+function drawBunny(ctx, x, y, color, ammo, inSlot){
+  let s = inSlot ? .8 : 1;
+  // Body
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,9*s,0,Math.PI*2);ctx.fill();
+  // Inner highlight
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.beginPath();ctx.arc(x-2*s,y-2*s,4*s,0,Math.PI*2);ctx.fill();
+  // Ears
+  ctx.fillStyle=color;ctx.fillRect(x-3*s,y-15*s,3*s,10*s);ctx.fillRect(x+1*s,y-15*s,3*s,10*s);
+  // Inner ear pink
+  ctx.fillStyle='#ffb6c1';ctx.fillRect(x-2*s,y-13*s,1.5*s,6*s);ctx.fillRect(x+2*s,y-13*s,1.5*s,6*s);
+  // Eyes
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x-2.5*s,y-2*s,2*s,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x+2.5*s,y-2*s,2*s,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(x-2*s,y-2*s,1*s,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x+3*s,y-2*s,1*s,0,Math.PI*2);ctx.fill();
+  // Nose
+  ctx.fillStyle='#ff69b4';ctx.beginPath();ctx.arc(x,y,1.5*s,0,Math.PI*2);ctx.fill();
+  
+  // Ammo badge above head
+  ctx.fillStyle='rgba(0,0,0,.8)';ctx.beginPath();ctx.roundRect(x-8*s,y-20*s,16*s,10*s,4);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font=`bold ${9*s}px sans-serif`;ctx.textAlign='center';
+  ctx.fillText(ammo, x, y-12*s);
+}
+
+// ===== INTERACTIONS =====
+function tapSupply(i){
+  let s=S.supply[i];if(!s||s.ammo<=0)return;
+  // Check belt capacity
+  if(S.belt.length >= BELT_CAPACITY){tst('🛑 Förderband voll! Warte...');return}
+  
+  // Create bunny and send to belt
+  s.ammo--;
+  S.belt.push({color:s.c, ammo:s.ammo===0?s.ammo+1:s.ammo, beltPos:Math.random(), shotCooldown:0});
+  // Update supply display
+  if(s.ammo<=0) S.supply.splice(i,1);
+  pushH();render();
+}
+
+function tapSlot(i){
+  let s=S.slots[i];if(!s)return;
+  if(S.belt.length >= BELT_CAPACITY){tst('🛑 Förderband voll! Warte...');return}
+  // Move from slot back to belt
+  S.belt.push({color:s.color, ammo:s.ammo, beltPos:Math.random(), shotCooldown:0});
+  S.slots[i]=null;
+  pushH();render();
+}
+
+// Add bunny to waiting slot if belt position wraps around
+// Check periodically in game loop for bunnies that should go to slots
+setInterval(()=>{
+  if(!loopId)return;
+  // Check for belt bunnies that could go to slots
+  let toSlot=[];
+  S.belt.forEach((b,i)=>{
+    // If bunny has made almost a full rotation and hasn't shot recently
+    if(b.beltPos > .9 && b.beltPos < 1 && b.ammo > 0 && b.shotCooldown > 0){
+      let freeSlot=S.slots.findIndex(s=>s===null);
+      if(freeSlot!==-1) toSlot.push({idx:i, slot:freeSlot});
+    }
+  });
+  toSlot.sort((a,b)=>b.idx-a.idx).forEach(({idx,slot})=>{
+    let b=S.belt.splice(idx,1)[0];
+    if(b) S.slots[slot]={color:b.color, ammo:b.ammo};
+  });
+  if(toSlot.length) render();
+},2000);
+
+document.getElementById('gameCanvas').addEventListener('click',function(e){shoot();});
+
+function pushH(){
+  S.hist.push({g:S.grid.map(r=>[...r]),belt:JSON.parse(JSON.stringify(S.belt)),slots:[...S.slots],supply:JSON.parse(JSON.stringify(S.supply))});
+  if(S.hist.length>30)S.hist.shift();
 }
 function doUndo(){
   if(!S.hist.length){tst('Nichts rückgängig');return}
-  let p=S.hist.pop();S.grid=p.g;S.ammo=p.ammo;
-  p.bunnyInfo.forEach((bi,i)=>{if(S.bunnies[i]){S.bunnies[i].angle=bi.angle;S.bunnies[i].shotTimer=bi.shotTimer;}});
-  render();
+  let p=S.hist.pop();S.grid=p.g;S.belt=p.belt;S.slots=p.slots;S.supply=p.supply;render();
 }
 function resetLvl(){
-  S.hist=[];let l=LV[S.lv];
-  S.grid=l.p.map(r=>[...r]);S.slots=[null,null,null,null,null];
-  S.ammo={};Object.entries(l.ammo).forEach(([ci,a])=>{S.ammo[ci]={c:parseInt(ci),n:a.n};});
-  render();tst('🔄 Zurückgesetzt');
+  S.hist=[];let l=LV[S.lv];S.grid=l.p.map(r=>[...r]);S.belt=[];S.slots=[null,null,null,null,null];
+  S.supply=l.supply.map(s=>({c:s.c,ammo:s.ammo}));render();tst('🔄 Zurückgesetzt');
+}
+function shoot(){
+  // Quick-tap: auto-send first available supply bunny to belt
+  let avail=S.supply.findIndex(s=>s.ammo>0);
+  if(avail!==-1){tapSupply(avail);return}
+  // Or check slots
+  let sl=S.slots.findIndex(s=>s!==null);
+  if(sl!==-1){tapSlot(sl);return}
+  tst('Keine Hasen mehr!');
 }
 
 function checkWin(){
-  let sz=LV[S.lv].sz,done=true;
-  for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(S.grid[r][c]>=0){done=false;break}
-  if(!done)return;
+  let sz=LV[S.lv].sz;for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(S.grid[r][c]>=0)return;
   S.com[S.lv]=true;S.coins+=10;sv();
+  cancelAnimationFrame(loopId);loopId=null;
   let pop=document.createElement('div');pop.className='win-o';
   pop.innerHTML=`<div class="win-c"><div class="em">🎉</div><h3>Level ${S.lv+1}!</h3><div class="rwd">+10 🪙</div>
-    <div class="acts">
-      <button class="big" style="width:auto;padding:0 18px;border-radius:18px;font-size:11px" onclick="nLv(this)">▶</button>
-      <button class="big" style="width:auto;padding:0 14px;border-radius:18px;font-size:11px;background:radial-gradient(circle at 30% 25%,#7b68ee,#3d1a60)" onclick="goMenu();this.closest('.win-o').remove()">🏠</button>
-    </div></div>`;
-  document.body.appendChild(pop);render();
+    <div class="acts"><button class="bigb" style="width:auto;padding:0 16px;border-radius:16px;font-size:11px" onclick="nxtLv(this)">▶</button>
+    <button class="bigb" style="width:auto;padding:0 12px;border-radius:16px;font-size:11px;background:radial-gradient(circle at 30% 25%,#7b68ee,#3d1a60)" onclick="goMenu();this.closest('.win-o').remove()">🏠</button></div></div>`;
+  document.body.appendChild(pop);draw();
 }
-function nLv(el){el.closest('.win-o').remove();let n=S.lv+1;if(n>=LV.length){goMenu();tst('🏆 Alle Level!');return}S.com[n]=true;sv();startLv(n);}
-
-// Slots & Ammo
-function pickSlot(i){
-  if(S.slots[i]!==null){S.ammo[S.slots[i]].n++;S.slots[i]=null;S.sel=null;pushH();render();return}
-  S.sel=S.sel===i?null:i;render();
-}
-function loadAmmo(ci){
-  if(!S.ammo[ci]||S.ammo[ci].n<=0)return;
-  let t=S.sel!==null&&S.slots[S.sel]===null?S.sel:S.slots.findIndex(s=>s===null);
-  if(t===-1){tst('Kein freier Slot!');return}
-  S.slots[t]=ci;S.ammo[ci].n--;S.sel=null;pushH();render();
-}
-
-// Tap on canvas to shoot at nearest matching cell
-document.getElementById('gameCanvas').addEventListener('click',function(e){
-  let cv=this,rect=cv.getBoundingClientRect();
-  let mx=(e.clientX-rect.left)*(cv.width/rect.width);
-  let my=(e.clientY-rect.top)*(cv.height/rect.height);
-  let l=LV[S.lv],sz=l.sz,C=S.CELL;
-  let ox=(cv.width-sz*C)/2, oy=(cv.height-sz*C)/2;
-  
-  // Check if tapped on a bunny
-  let cx=ox+sz*C/2, cy=oy+sz*C/2, rr=sz*C/2+30;
-  let tappedBunny=null;
-  S.bunnies.forEach(b=>{
-    let bx=cx+Math.cos(b.angle)*rr, by=cy+Math.sin(b.angle)*rr;
-    if(Math.hypot(mx-bx,my-by)<18)tappedBunny=b;
-  });
-  
-  if(tappedBunny){
-    // Select this bunny's color for next shot
-    loadAmmo(tappedBunny.color);
-    return;
-  }
-  
-  // Otherwise shoot
-  shoot();
-});
+function nxtLv(el){el.closest('.win-o').remove();let n=S.lv+1;if(n>=LV.length){goMenu();tst('🏆 Alle Level!');return}S.com[n]=true;sv();startLv(n);}
 
 function render(){
   let l=LV[S.lv];
   document.getElementById('lvlTag').textContent='Level '+(S.lv+1);
   document.getElementById('coinNum').textContent=S.coins;
   
-  // Slots
-  let sr=document.getElementById('slots');
-  sr.innerHTML=S.slots.map((sc,i)=>{
-    if(sc===null)return`<div class="slot" onclick="pickSlot(${i})"></div>`;
-    let sel=S.sel===i?' sel':'';
-    return`<div class="slot filled${sel}" onclick="pickSlot(${i})"><div class="blk" style="background:${PAL[sc]}"></div></div>`;
+  // Waiting slots
+  let sr=document.getElementById('slotsRow');
+  sr.innerHTML=S.slots.map((s,i)=>{
+    if(!s)return`<div class="slot" onclick="tapSlot(${i})" style="font-size:18px;color:#3d2a60">+</div>`;
+    return`<div class="slot active" onclick="tapSlot(${i})">
+      <div class="bun" style="background:${PAL[s.color]}">🐰</div>
+      <div class="ammocount">${s.ammo}</div></div>`;
   }).join('');
   
-  // Ammo
-  let ar=document.getElementById('ammo');
-  ar.innerHTML=Object.entries(S.ammo).map(([ci,a])=>{
-    let cls=a.n<=0?' spent':'';
-    return`<div class="ammo-stack" onclick="loadAmmo(${ci})">
-      <div class="cap${cls}" style="background:${PAL[ci]}">${a.n}</div>
-      <div class="ammo-lbl">${a.n}×</div></div>`;
+  // Supply bunnies
+  let sp=document.getElementById('supplyRow');
+  sp.innerHTML=S.supply.map((s,i)=>{
+    let cls=s.ammo<=0?' spent':'';
+    return`<div class="supply-bun ${cls}" style="background:${PAL[s.c]}" onclick="tapSupply(${i})">
+      <div class="ammotop">${s.ammo}</div>🐰</div>`;
   }).join('');
 }
 
 // Menu
 function buildMenu(){
-  let cnt=document.getElementById('levelList');
-  let html='',mx=Math.min(35,LV.length),from=Math.max(0,Math.min(S.lv-6,mx-12)),to=Math.min(mx,from+12);
-  let best=0;for(let i=LV.length-1;i>=0;i--){if(S.com[i]){best=i;break}}
-  for(let i=from;i<to;i++){
+  let grid=document.getElementById('levelGrid');grid.innerHTML='';
+  let mx=Math.min(50,LV.length);
+  for(let i=0;i<mx;i++){
     let cls=S.com[i]?'done':(i>0&&!S.com[i-1]?'locked':'');
-    html+=`<div class="lvl-node ${cls}" onclick="${cls.includes('locked')?'':"startLv("+i+")"}">${i+1}</div>`;
-    if(i<to-1)html+='<div class="lvl-conn"></div>';
+    grid.innerHTML+=`<div class="lvl-dot ${cls}" onclick="${cls.includes('locked')?'':"startLv("+i+")"}">${i+1}</div>`;
   }
-  cnt.innerHTML=html;
 }
+
 function tst(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1400)}
 
 // Init
 ld();buildMenu();
+document.getElementById('menuView').style.display='flex';
+document.getElementById('gameView').style.display='none';
 </script>
 </body>
 </html>

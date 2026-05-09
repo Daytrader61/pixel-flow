@@ -174,22 +174,41 @@ function draw(){
   });
 }
 
+// Reattach slot+supply events after render
+function reAttach(){
+  document.querySelectorAll('#slots .slot').forEach(function(el,i){
+    el.onclick=function(){slotTap(i);};
+  });
+  document.querySelectorAll('#supply .capsule').forEach(function(el,i){
+    el.onclick=function(){supplyTap(i);};
+  });
+}
 function render(){
   document.getElementById('levelBadge').textContent='Level '+(state.lv+1);
   document.getElementById('coins').textContent=state.coins;
   let rem=0;state.grid.forEach(r=>r.forEach(v=>{if(v>=0)rem++}));
   document.getElementById('remaining').textContent=rem;
   
-  // Slots
+  // Clear old events
   let sr=document.getElementById('slots');
-  sr.innerHTML=state.slots.map((s,i)=>{
+  sr.replaceChildren();
+  state.slots.forEach(function(s,i){
     if(s)return`<div class="slot filled" style="background:${P[s.c]};color:${P[s.c]}" onclick="slotTap(${i})">🐰</div>`;
     return`<div class="slot" onclick="slotTap(${i})" style="color:#1e3a5f">+</div>`;
   }).join('');
   
   // Supply
   let su=document.getElementById('supply');
-  su.innerHTML=state.supply.map((s,i)=>`<div class="capsule${s.a<=0?' empty':''}" style="background:${P[s.c]}" onclick="supplyTap(${i})"><div class="cnt">${s.a}</div>🐰</div>`).join('');
+  su.replaceChildren();
+  state.supply.forEach(function(s,i){
+    var el=document.createElement('div');
+    el.className='capsule'+(s.a<=0?' empty':'');
+    el.style.background=P[s.c];
+    el.innerHTML='<div class="cnt">'+s.a+'</div>🐰';
+    el.onclick=function(){supplyTap(i);};
+    su.appendChild(el);
+  });
+  reAttach();
 }
 
 function supplyTap(i){
@@ -207,7 +226,12 @@ function slotTap(i){
 }
 
 // Tap canvas anywhere = send from supply
-document.getElementById('c').onclick=()=>{let av=state.supply.findIndex(s=>s.a>0);if(av!==-1)supplyTap(av);else{let sl=state.slots.findIndex(s=>s!==null);if(sl!==-1)slotTap(sl);}};
+document.getElementById('c').addEventListener('click',function(){
+  let av=state.supply.findIndex(function(s){return s.a>0;});
+  if(av!==-1){supplyTap(av);return;}
+  let sl=state.slots.findIndex(function(s){return s!==null;});
+  if(sl!==-1){slotTap(sl);}
+});
 
 function saveHist(){
   state.hist.push({g:state.grid.map(r=>[...r]),b:JSON.parse(JSON.stringify(state.belt)),sl:[...state.slots],su:JSON.parse(JSON.stringify(state.supply))});

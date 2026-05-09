@@ -251,20 +251,8 @@ function tL(i){
   S.b.push({c:s.c,a:s.a,p:Math.random(),cd:0});S.sl[i]=null;pH();r();
 }
 
-document.getElementById('gcv').addEventListener('pointerdown',function(e){
-  e.preventDefault();
-  let cv=this,rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
-  mx*=cv.width/rect.width;my*=cv.height/rect.height;
-  let l=LV[S.lv],sz=l.sz,C=S.CL,ox=(cv.width-sz*C)/2,oy=(cv.height-sz*C)/2;
-  let cx=ox+sz*C/2,cy=oy+sz*C/2,bR=sz*C/2+22;
-  for(let i=S.b.length-1;i>=0;i--){
-    let b=S.b[i],ang=b.p*Math.PI*2+S.bc*Math.PI*2;
-    let bx=cx+Math.cos(ang)*bR,by=cy+Math.sin(ang)*bR;
-    if(Math.hypot(mx-bx,my-by)<18){
-      let si=S.sl.indexOf(null);if(si!==-1){let b2=S.b.splice(i,1)[0];S.sl[si]={c:b2.c,a:b2.a};pH();r();}
-      else ts('Kein Platz in Slots!');return;
-    }
-  }
+document.getElementById('gcv').addEventListener('click',function(e){
+  // Only catch clicks on the canvas itself, not on belt bunnies
   let av=S.sp.findIndex(s=>s.a>0);
   if(av!==-1){tS(av);return}
   let sl=S.sl.findIndex(s=>s!==null);

@@ -4,303 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Pixel Flow</title>
-<style>*{margin:0;padding:0}body{background:#0d0620;overflow:hidden;touch-action:manipulation}</style>
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+<style>*{margin:0;padding:0}body{background:#060218;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}</style>
 </head>
 <body>
-
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
 <script>
-// Pixel art patterns - exact shapes like original game
-const PATTERNS = [];
-// Generate 50 hand-designed pixel art patterns
-(function(){
-  const SHAPES = [
-    // Hollow squares
-    (sz)=> {let p=[];for(let x=2;x<sz-2;x++)for(let y=2;y<sz-2;y++)if(x===2||x===sz-3||y===2||y===sz-3)p.push({x,y,c:0});return p;},
-    // Stripes  
-    (sz)=> {let p=[];for(let y=0;y<sz;y++){let c=y%3;p.push.apply(p,Array.from({length:sz},(_,x)=>({x,y,c})));}return p;},
-    // Cross
-    (sz)=>{let p=[],c=sz/2|0;for(let i=0;i<sz;i++){p.push({x:i,y:c,c:0});p.push({x:c,y:i,c:i===c?0:1});}return p;},
-    // Diamond
-    (sz)=>{let p=[],c=sz/2|0;for(let r=0;r<sz;r++)for(let col=0;col<sz;col++)if(Math.abs(r-c)+Math.abs(col-c)<=sz/3)p.push({x:col,y:r,c:(r+col)%2});return p;},
-    // Frame with center
-    (sz)=>{let p=[];for(let x=0;x<sz;x++)for(let y=0;y<sz;y++){if(x===0||x===sz-1||y===0||y===sz-1)p.push({x,y,c:0});else if(x===sz/2|0||y===sz/2|0)p.push({x,y,c:1});}return p;},
-    // Checker
-    (sz)=>{let p=[];for(let x=0;x<sz;x++)for(let y=0;y<sz;y++)p.push({x,y,c:(x+y)%3===0?0:(x+y)%3===1?1:2});return p;},
-    // L-shapes
-    (sz)=>{let p=[];for(let x=0;x<sz/2;x++)for(let y=0;y<sz;y++)p.push({x,y,c:0});for(let x=sz/2;x<sz;x++)for(let y=sz/2;y<sz;y++)p.push({x,y,c:1});return p;},
-    // Planet with ring
-    (sz)=>{let p=[],cx=sz/2|0,cy=sz/2|0;for(let a=0;a<Math.PI*2;a+=.1){for(let r=2;r<sz/3;r++){let x=cx+Math.cos(a)*r|0,y=cy+Math.sin(a)*r*.6|0;if(x>=0&&x<sz&&y>=0&&y<sz)p.push({x,y,c:0});}for(let r=sz/4;r<sz/4+3;r++){let x=cx+Math.cos(a)*r|0,y=cy+Math.sin(a)*r*.35|0;if(x>=0&&x<sz&&y>=0&&y<sz)p.push({x,y,c:1});}}return p;},
-    // Target
-    (sz)=>{let p=[],cx=sz/2|0;for(let r=1;r<sz-1;r++)for(let c=1;c<sz-1;c++){let d=Math.abs(r-cx)+Math.abs(c-cx);if(d<sz/4)p.push({x:c,y:r,c:0});else if(d<sz/2.5)p.push({x:c,y:r,c:1});else p.push({x:c,y:r,c:2});}return p;},
-    // Arrow
-    (sz)=>{let p=[],cx=sz/2|0;for(let r=0;r<sz;r++){for(let c=0;c<sz;c++){if(c===cx||r===cx-2||r===cx+2||(r<cx&&c>cx-3&&c<cx+3)||(r>cx&&c>cx-3&&c<cx+3))p.push({x:c,y:r,c:r<cx?0:1});}}return p;},
-    // Grid with missing corners
-    (sz)=>{let p=[];for(let x=2;x<sz-2;x++)for(let y=2;y<sz-2;y++){if(x===2||x===sz-3||y===2||y===sz-3){if(Math.abs(x-sz/2)>1&&Math.abs(y-sz/2)>1)p.push({x,y,c:0});}else if((x+y)%2===0)p.push({x,y,c:1});}return p;},
-  ];
+const P=[0xf06292,0x66bb6a,0x42a5f5,0xffa726,0xab47bc,0xfff176,0x4dd0e1,0xef5350];
+const BG=0x060218,GBG=0x0a0018,BELT_BG=0x0d0520,BELT=0x1a0d38,BELT_A=0x5c3d8a,BM=5;
 
-  for(let i=0;i<50;i++){
-    let sz = i<8?5:i<18?6:i<32?7:i<42?8:9;
-    let si = Math.min(i%SHAPES.length, SHAPES.length-1);
-    let raw = SHAPES[si](sz);
-    let p = Array.from({length:sz},()=>Array(sz).fill(-1));
-    raw.forEach(({x,y,c})=>{if(x>=0&&x<sz&&y>=0&&y<sz)p[y][x]=c%Math.min(3+Math.floor(i/12),6);});
-    let used=new Set();p.forEach(r=>r.forEach(v=>{if(v>=0)used.add(v);}));
-    let ammo={};used.forEach(c=>{let n=0;p.forEach(r=>r.forEach(v=>{if(v===c)n++;}));ammo[c]=n+2;});
-    PATTERNS.push({sz,p,ammo});
+// Hand-crafted pixel art patterns
+const LVS=[];
+(function(){
+  const S=[];
+  for(let i=0;i<60;i++){
+    let sz=i<6?5:i<14?6:i<26?7:i<38?8:i<50?9:10;
+    let g=Array.from({length:sz},()=>Array(sz).fill(-1));
+    let nc=Math.min(2+Math.floor(i/10),6),cs=[...Array(8).keys()].sort(()=>Math.random()-.5).slice(0,nc);
+    // Generate structured patterns not random noise
+    if(i%5===0){ // Frame
+      for(let y=1;y<sz-1;y++)for(let x=1;x<sz-1;x++)if(x===1||x===sz-2||y===1||y===sz-2)g[y][x]=cs[0];
+      for(let y=sz/3|0;y<sz*2/3;y++)for(let x=sz/3|0;x<sz*2/3;x++)if(nc>1&&(x+y)%2===0)g[y][x]=cs[1];
+    }else if(i%5===1){ // Planet
+      let cx=sz/2|0,cy=sz/2|0;
+      for(let a=0;a<Math.PI*2;a+=.08){for(let r=1;r<sz/3;r++){let x=cx+Math.cos(a)*r|0,y=cy+Math.sin(a)*r*.6|0;if(x>=0&&x<sz&&y>=0&&y<sz)g[y][x]=cs[0];}}
+      if(nc>1){for(let a=0;a<Math.PI*2;a+=.08){for(let r=sz/4;r<sz/4+4;r++){let x=cx+Math.cos(a)*r|0,y=cy+Math.sin(a)*r*.3|0;if(x>=0&&x<sz&&y>=0&&y<sz)g[y][x]=cs[1];}}}
+    }else if(i%5===2){ // Stripes
+      for(let y=0;y<sz;y++)for(let x=0;x<sz;x++)g[y][x]=cs[(y%4)<2?0:(nc>1?1:0)];
+    }else if(i%5===3){ // Cross
+      let c=sz/2|0;for(let i=0;i<sz;i++){g[i][c]=cs[0];g[c][i]=nc>1?cs[1]:cs[0];}
+      if(nc>2)for(let y=1;y<sz-1;y++)for(let x=1;x<sz-1;x++)if(Math.abs(y-c)<2&&Math.abs(x-c)<2&&!(y===c||x===c))g[y][x]=cs[2];
+    }else{ // Target
+      let c=sz/2|0;for(let y=0;y<sz;y++)for(let x=0;x<sz;x++){let d=Math.abs(y-c)+Math.abs(x-c);if(d<sz/6)g[y][x]=cs[0];else if(nc>1&&d<sz/3)g[y][x]=cs[1];else if(nc>2&&d<sz/2)g[y][x]=cs[2];}
+    }
+    let used=new Set();g.forEach(r=>r.forEach(v=>{if(v>=0)used.add(v);}));if(used.size<2)g[sz/2|0][sz/2|0]=cs[1]||0,used.add(cs[1]||0);
+    let am={};used.forEach(c=>{let n=0;g.forEach(r=>r.forEach(v=>{if(v===c)n++;}));am[c]=n+2+Math.floor(Math.random()*3);});
+    LVS.push({sz,g,am});
   }
 })();
 
-// Game state
-let S={lv:0,grid:[],ammo:{},belt:[],slots:[null,null,null,null,null],hist:[],coins:0,com:{},CELL:0};
-try{S.com=JSON.parse(localStorage.getItem('pf14c')||'{}');S.coins=parseInt(localStorage.getItem('pf14n'))||0}catch(e){}
-function sv(){try{localStorage.setItem('pf14c',JSON.stringify(S.com));localStorage.setItem('pf14n',''+S.coins)}catch(e){}}
+let S={lv:0,g:[],am:{},belt:[],sl:[null,null,null,null,null],cn:0,cm:{},hi:[],CL:0};
+try{S.cm=JSON.parse(localStorage.getItem('pfx_c')||'{}');S.cn=parseInt(localStorage.getItem('pfx_n'))||0}catch(e){}
+function sv(){localStorage.setItem('pfx_c',JSON.stringify(S.cm));localStorage.setItem('pfx_n',''+S.cn);}
+function sh(){S.hi.push({g:S.g.map(r=>[...r]),am:{...S.am},belt:S.belt.map(b=>({c:b.c,a:b.a,p:b.p,cd:b.cd})),sl:[...S.sl]});if(S.hi.length>30)S.hi.shift();}
 
-// Colors
-const PAL=[0xf06292,0x66bb6a,0x42a5f5,0xffa726,0xab47bc,0xfff176,0x4dd0e1,0xef5350];
-const PAL_STR=PAL.map(c=>'#'+c.toString(16).padStart(6,'0'));
-const BG=0x0d0620, GRID_BG=0x0a0018, BELT_COLOR=0x1e1040, BELT_ACCENT=0x6a3d99;
-const BELT_MAX=5;
-
-class MainScene extends Phaser.Scene {
-  constructor(){super('main');}
-  
+class MenuS extends Phaser.Scene {
+  constructor(){super('menu');}
   create(){
-    this.cameras.main.setBackgroundColor(BG);
-    let lvl=PATTERNS[S.lv],sz=lvl.sz;
-    S.CELL=Math.floor((Math.min(this.scale.width-40,this.scale.height-340))/sz);
-    S.grid=lvl.p.map(r=>[...r]);
-    S.ammo={};Object.entries(lvl.ammo).forEach(([c,n])=>{S.ammo[c]=n;});
-    S.belt=[];S.slots=[null,null,null,null,null];S.hist=[];
+    let W=this.scale.width,H=this.scale.height;
+    let bg=this.add.graphics();bg.fillGradientStyle(0x060218,0x060218,0x0d0520,0x0d0520,1);bg.fillRect(0,0,W,H);
     
-    let w=sz*S.CELL, h=sz*S.CELL;
-    let gx=(this.scale.width-w)/2, gy=(this.scale.height-h-260)/2;
-    let cx=gx+sz*S.CELL/2, cy=gy+sz*S.CELL/2, bR=sz*S.CELL/2+18;
+    // Decorative particles
+    for(let i=0;i<20;i++){let d=this.add.circle(Math.random()*W,Math.random()*H,1.5,P[Math.floor(Math.random()*P.length)],.3);
+      this.tweens.add({targets:d,alpha:0,y:Math.random()*H,duration:3000+Math.random()*4000,repeat:-1,delay:Math.random()*2000});}
+    
+    let t=this.add.text(W/2,50,'PIXEL FLOW',{fontFamily:'system-ui',fontSize:'28px',fontWeight:'900',color:'#ce93d8'}).setOrigin(.5);
+    this.tweens.add({targets:t,alpha:.6,yoyo:true,duration:2500,repeat:-1});
+    this.add.text(W/2,82,'Verbinde die Farben · Befreie das Feld',{fontSize:'11px',color:'#7e57c2'}).setOrigin(.5);
+    
+    let best=0;for(let i=59;i>=0;i--){if(S.cm[i]){best=i;break}}
+    for(let i=0;i<30;i++){
+      let x=30+(i%6)*58,y=110+Math.floor(i/6)*58;
+      let ok=!!S.cm[i],lk=i>0&&!S.cm[i-1]&&!ok,nxt=(i===best+1||(i===0&&!S.cm[0]));
+      let c=ok?0x43a047:lk?0x333344:nxt?0x1e88e5:0x6a1b9a;
+      let n=this.add.circle(x+22,y+22,18,c);if(nxt)this.tweens.add({targets:n,scaleX:1.18,scaleY:1.18,yoyo:true,duration:700,repeat:-1});
+      this.add.text(x+22,y+22,''+(i+1),{fontSize:'11px',fontWeight:'bold',color:'#fff'}).setOrigin(.5);
+      if(!lk){n.setInteractive({useHandCursor:true});n.on('pointerdown',()=>{S.lv=i;this.scene.start('game');});}
+    }
+    
+    let yp=H-80,pl=this.add.rectangle(W/2,yp,250,56,0xffd700).setStrokeStyle(4,0x1a1a1a);
+    pl.setInteractive({useHandCursor:true});pl.on('pointerover',()=>pl.setScale(1.04));pl.on('pointerout',()=>pl.setScale(1));
+    pl.on('pointerdown',()=>{let l=0;for(let i=59;i>=0;i--){if(S.cm[i]){l=Math.min(i+1,59);break}}S.lv=l;this.scene.start('game');});
+    this.add.text(W/2,yp,'▶ SPIELEN',{fontSize:'20px',fontWeight:'900',color:'#1a1a1a'}).setOrigin(.5);
+    this.add.text(W/2,yp-40,'🪙 '+S.cn,{fontSize:'14px',color:'#ffd700',fontWeight:'700'}).setOrigin(.5);
+  }
+}
+
+class GameS extends Phaser.Scene {
+  constructor(){super('game');}
+  create(){
+    let lv=LVS[S.lv],sz=lv.sz,W=this.scale.width,H=this.scale.height;
+    S.CL=Math.floor((Math.min(W-40,H-350))/sz);S.g=lv.g.map(r=>[...r]);S.am={};Object.entries(lv.am).forEach(([c,n])=>S.am[c]=n);
+    S.belt=[];S.sl=[null,null,null,null,null];S.hi=[];
+    let ox=(W-sz*S.CL)/2,oy=(H-sz*S.CL-280)/2,cx=W/2,cy=oy+sz*S.CL/2,bR=sz*S.CL/2+20;
+    this.sz=sz;this.W=W;this.H=H;this.ck=0;this.done=false;this.ox=ox;this.oy=oy;this.cx=cx;this.cy=cy;this.bR=bR;
+    
+    // Bg gradient
+    let bg=this.add.graphics();bg.fillGradientStyle(0x060218,0x060218,0x0d0520,0x0d0520,1);bg.fillRect(0,0,W,H);
+    
+    // Chassis
+    let ch=this.add.graphics();
+    ch.fillStyle(0x110720,.9);ch.fillRoundedRect(ox-14,oy-14,sz*S.CL+28,sz*S.CL+28,16);
+    ch.fillStyle(GBG,1);ch.fillRoundedRect(ox-2,oy-2,sz*S.CL+4,sz*S.CL+4,10);
+    
+    // Vents
+    for(let i=0;i<10;i++){let vx=ox+i*((sz*S.CL+28)/10)+2;ch.fillStyle(0x0a0018,.8);ch.fillRect(vx,oy-10,4,6);}
     
     // Belt ring
-    let belt=this.add.graphics();
-    belt.lineStyle(8, BELT_COLOR,1);belt.strokeCircle(cx,cy,bR);
-    belt.lineStyle(2,BELT_ACCENT,.6);belt.strokeCircle(cx,cy,bR);
+    this.bGfx=this.add.graphics();
+    this.bGfx.fillStyle(0x040112,.9);this.bGfx.fillCircle(cx,cy,bR+12);
+    this.bGfx.lineStyle(8,BELT,1);this.bGfx.strokeCircle(cx,cy,bR+4);
+    this.bGfx.lineStyle(2,BELT_A,.5);this.bGfx.setLineDash([5,4]);this.bGfx.strokeCircle(cx,cy,bR-1);this.bGfx.setLineDash([]);
     
-    // Grid bg
-    let gfx=this.add.graphics();
-    gfx.fillStyle(GRID_BG,1);gfx.fillRect(gx-2,gy-2,w+4,h+4);
-    
-    // Draw grid
-    this.cells=new Map();
-    for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){
-      let x=gx+c*S.CELL+S.CELL/2, y=gy+r*S.CELL+S.CELL/2;
-      let v=S.grid[r][c];
-      let rect=this.add.rectangle(x,y,S.CELL-1,S.CELL-1,v>=0?PAL[v]:GRID_BG);
-      rect.setStrokeStyle(.3,0xffffff,.03);
-      this.cells.set(r*sz+c,rect);
-    }
-    
-    // Supply capsules
-    this.supBtns=[];
-    Object.entries(S.ammo).forEach(([ci,n],i)=>{
-      let x=this.scale.width/2-((Object.keys(S.ammo).length-1)*30)+(i*60);
-      let y=this.scale.height-120;
-      let cap=this.add.container(x,y);
-      let bg=this.add.rectangle(0,0,52,66,parseInt(ci)<PAL.length?PAL[ci]:0xffffff);
-      bg.setStrokeStyle(3,0xffffff,.1);
-      let gloss=this.add.rectangle(0,-18,36,10,0xffffff,.2);
-      let label=this.add.text(0,0,''+n,{fontSize:'14px',fontWeight:'bold',color:'#fff'}).setOrigin(.5);
-      label.y=0;
-      let ammotag=this.add.text(0,-30,''+n,{fontSize:'10px',color:'#fff',backgroundColor:'#111',padding:{x:4,y:1}}).setOrigin(.5);
-      cap.add([bg,gloss,label,ammotag]);
-      cap.setInteractive(new Phaser.Geom.Rectangle(-28,-34,56,68),Phaser.Geom.Rectangle.Contains);
-      cap.on('pointerdown',()=>this.tapSupply(parseInt(ci)));
-      this.supBtns.push({ci:parseInt(ci),cap,label,ammotag});
-    });
+    // Grid cells
+    this.cs=[];
+    for(let r=0;r<sz;r++){this.cs[r]=[];
+      for(let c=0;c<sz;c++){let x=ox+c*S.CL+S.CL/2,y=oy+r*S.CL+S.CL/2,v=S.g[r][c];
+        let rect=this.add.rectangle(x,y,S.CL-2,S.CL-2,v>=0?P[v]:GBG).setStrokeStyle(.4,0xffffff,.03);
+        if(v>=0){let hl=this.add.rectangle(x,y-(S.CL/2-3),S.CL-4,3,0xffffff,.1);let sd=this.add.rectangle(x,y+(S.CL/2-3),S.CL-4,2,0x000000,.2);}
+        this.cs[r][c]=rect;
+    }}
     
     // Slots
-    this.slotBtns=[];
-    for(let i=0;i<5;i++){
-      let x=this.scale.width/2-100+(i*50);
-      let y=this.scale.height-170;
-      let sl=this.add.rectangle(x,y,44,38,GRID_BG).setStrokeStyle(2,BELT_ACCENT,.3);
-      sl.setInteractive();
-      sl.on('pointerdown',()=>this.tapSlot(i));
-      this.slotBtns.push(sl);
+    this.slGs=[];
+    for(let i=0;i<5;i++){let sx=W/2-100+i*50,sy=H-170;
+      let bg=this.add.rectangle(sx,sy,48,42,GBG).setStrokeStyle(2,BELT_A,.3);
+      this.slGs.push(bg);
+      // Slot label "+"
+      this.add.text(sx,sy,'+',{fontSize:'18px',color:'#3d2850'}).setOrigin(.5);
     }
     
-    // Undo/Reset
-    let ub=this.add.circle(this.scale.width/2-30,this.scale.height-80,22,0x1565c0).setStrokeStyle(2,0xffffff,.15);
-    ub.setInteractive();ub.on('pointerdown',()=>this.goMenu());
-    this.add.text(this.scale.width/2-30,this.scale.height-80,'◀',{fontSize:'16px',color:'#fff'}).setOrigin(.5);
+    // Capsules
+    this.cpGs=[];this.cpTs=[];this.cpAs=[];
+    let aci=Object.keys(S.am).map(Number);
+    aci.forEach((ci,j)=>{
+      let x=W/2-((aci.length-1)*30)+j*60,y=H-112;
+      let cap=this.add.rectangle(x,y,54,70,P[ci]).setStrokeStyle(3,0xffffff,.1);
+      let gl=this.add.rectangle(x,y-22,36,12,0xffffff,.25);
+      let lt=this.add.text(x,y+2,''+S.am[ci],{fontSize:'16px',fontWeight:'bold',color:'#fff'}).setOrigin(.5);
+      let at=this.add.text(x,y-34,''+S.am[ci],{fontSize:'11px',fontWeight:'bold',color:'#fff',backgroundColor:'#111',padding:{x:7,y:2}}).setOrigin(.5);
+      cap.setInteractive({useHandCursor:true});
+      cap.on('pointerdown',()=>this.ts(ci));
+      cap.on('pointerover',()=>cap.setScale(1.06));cap.on('pointerout',()=>cap.setScale(1));
+      this.cpGs.push({ci,cap,lt,at});
+    });
     
-    let rb=this.add.circle(this.scale.width/2+30,this.scale.height-80,22,0x1565c0).setStrokeStyle(2,0xffffff,.15);
-    rb.setInteractive();rb.on('pointerdown',()=>this.reset());
-    this.add.text(this.scale.width/2+30,this.scale.height-80,'↺',{fontSize:'16px',color:'#fff'}).setOrigin(.5);
+    // Bottom buttons
+    let btnY=H-65;
+    let ub=this.add.circle(W/2-35,btnY,24,0x1565c0).setStrokeStyle(2,0xffffff,.15);
+    ub.setInteractive({useHandCursor:true});ub.on('pointerdown',()=>this.undo());
+    this.add.text(W/2-35,btnY,'↩',{fontSize:'17px',color:'#fff'}).setOrigin(.5);
     
-    // Level text
-    this.add.text(this.scale.width/2,20,'◇ Level '+(S.lv+1),{fontSize:'14px',fontWeight:'bold',color:'#ce93d8'}).setOrigin(.5);
-    this.add.text(this.scale.width-60,20,'🪙 '+S.coins,{fontSize:'13px',color:'#ffd700'}).setOrigin(.5);
+    let rb=this.add.circle(W/2+35,btnY,24,0x1565c0).setStrokeStyle(2,0xffffff,.15);
+    rb.setInteractive({useHandCursor:true});rb.on('pointerdown',()=>this.reset());
+    this.add.text(W/2+35,btnY,'↺',{fontSize:'17px',color:'#fff'}).setOrigin(.5);
     
-    // Bunny sprites on belt (simple circles)
-    this.beltGfx=this.add.graphics();
-    this.beltSprites=[];
+    // HUD
+    this.add.text(W/2,16,'◇ Level '+(S.lv+1),{fontSize:'14px',fontWeight:'bold',color:'#ce93d8'}).setOrigin(.5);
+    this.cnTxt=this.add.text(W-30,16,'🪙 '+S.cn,{fontSize:'12px',color:'#ffd700',fontWeight:'700'}).setOrigin(1,.5);
+    this.hintTxt=this.add.text(W/2,H-194,'FARBE ANTIPPEN → HASE AUFS BAND',{fontSize:'10px',color:'#7e57c2',fontWeight:'600'}).setOrigin(.5);
+    this.beltCountTxt=this.add.text(40,H-194,'',{fontSize:'10px',color:'#ffd700',fontWeight:'700'});
     
-    // Hit effects container
-    this.hitGfx=this.add.graphics();
+    // Bunny display
+    this.bunGfx=this.add.graphics();
     
-    // Start loop
-    this.beltClock=0;
-    this.time.addEvent({delay:16,loop:true,callback:()=>this.updateBelt()});
+    // Game loop
+    this.time.addEvent({delay:16,loop:true,callback:()=>this.tick()});
   }
   
-  updateBelt(){
-    this.beltClock=(this.beltClock+.012)%1;
-    let lvl=PATTERNS[S.lv],sz=lvl.sz;
-    let gx=(this.scale.width-sz*S.CELL)/2, gy=(this.scale.height-sz*S.CELL-260)/2;
-    let cx=gx+sz*S.CELL/2, cy=gy+sz*S.CELL/2, bR=sz*S.CELL/2+18;
-    
+  tick(){
+    this.ck=(this.ck+.012)%1;let lv=LVS[S.lv],sz=this.sz;
     // Auto-shoot
     S.belt.forEach(b=>{
       b.cd=Math.max(0,b.cd-16);
       if(b.a>0&&b.cd<=0){
-        let best=null,ba=1e9,bg=b.pos*Math.PI*2+this.beltClock*Math.PI*2;
-        for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(S.grid[r][c]===b.c){
-          let ta=Math.atan2(r-sz/2+.5,c-sz/2+.5);
-          let df=Math.abs(((bg-ta+Math.PI*3)%(Math.PI*2))-Math.PI);
-          if(df<ba&&df<.4){ba=df;best={r,c};}
+        let bs=null,ba=1e9,bg=b.p*Math.PI*2+this.ck*Math.PI*2;
+        for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(S.g[r][c]===b.c){
+          let ta=Math.atan2(r-sz/2+.5,c-sz/2+.5),df=Math.abs(((bg-ta+Math.PI*3)%(Math.PI*2))-Math.PI);
+          if(df<ba&&df<.35){ba=df;bs={r,c};}
         }
-        if(best&&ba<.32){
-          S.grid[best.r][best.c]=-1;b.a--;b.cd=200;
-          // Update grid cell
-          let key=best.r*sz+best.c;
-          if(this.cells.has(key))this.cells.get(key).setFillStyle(GRID_BG);
-          // Hit effect
-          let tx=gx+best.c*S.CELL+S.CELL/2,ty=gy+best.r*S.CELL+S.CELL/2;
-          b.fx=cx+Math.cos(b.pos*Math.PI*2+this.beltClock*Math.PI*2)*bR;
-          b.fy=cy+Math.sin(b.pos*Math.PI*2+this.beltClock*Math.PI*2)*bR;
-          b.tx=tx;b.ty=ty;b.impact=200;
+        if(bs&&ba<.28){
+          S.g[bs.r][bs.c]=-1;b.a--;b.cd=180;
+          this.cs[bs.r][bs.c].setFillStyle(GBG);
+          // Impact particle
+          let tx=this.ox+bs.c*S.CL+S.CL/2,ty=this.oy+bs.r*S.CL+S.CL/2;
+          let fl=this.add.circle(tx,ty,4,0xffffff,.9);
+          this.tweens.add({targets:fl,scale:3,alpha:0,duration:350,onComplete:()=>fl.destroy()});
+          // Beam
+          let bx=this.cx+Math.cos(b.p*Math.PI*2+this.ck*Math.PI*2)*this.bR,by=this.cy+Math.sin(b.p*Math.PI*2+this.ck*Math.PI*2)*this.bR;
+          let bm=this.add.graphics();bm.lineStyle(2,P[b.c],.5);bm.beginPath();bm.moveTo(bx,by);bm.lineTo(tx,ty);bm.strokePath();
+          this.tweens.add({targets:bm,alpha:0,duration:300,onComplete:()=>bm.destroy()});
+          // Cell flash
+          this.cs[bs.r][bs.c].setFillStyle(P[b.c]);this.time.delayedCall(50,()=>this.cs[bs.r][bs.c].setFillStyle(GBG));
         }
       }
     });
+    // Remove dead / slot
+    for(let i=S.belt.length-1;i>=0;i--){let b=S.belt[i];if(b.a<=0){S.belt.splice(i,1);continue}if(b.p>.88){let si=S.sl.indexOf(null);if(si!==-1)S.sl[si]=S.belt.splice(i,1)[0];}}
     
-    // Remove dead, move to slots
-    for(let i=S.belt.length-1;i>=0;i--){
-      let b=S.belt[i];
-      if(b.a<=0){S.belt.splice(i,1);continue}
-      if(b.pos>.88){let si=S.slots.indexOf(null);if(si!==-1)S.slots[si]=S.belt.splice(i,1)[0];}
-    }
-    
-    // Draw bunnies
-    this.beltGfx.clear();
+    this.drawBunnies();
+    this.updateUI();
+    this.checkWin();
+  }
+  
+  drawBunnies(){
+    if(this._tmp)this._tmp.forEach(t=>t.destroy());this._tmp=[];
+    let g=this.bunGfx;g.clear();
     S.belt.forEach(b=>{
-      let ang=b.pos*Math.PI*2+this.beltClock*Math.PI*2;
-      let bx=cx+Math.cos(ang)*bR, by=cy+Math.sin(ang)*bR;
-      this.beltGfx.fillStyle(PAL[b.c],1);
-      this.beltGfx.fillCircle(bx,by,7);
-      this.beltGfx.fillStyle(0xffffff,.2);
-      this.beltGfx.fillCircle(bx-1,by-1,3);
+      let a=b.p*Math.PI*2+this.ck*Math.PI*2,bx=this.cx+Math.cos(a)*this.bR,by=this.cy+Math.sin(a)*this.bR;
+      // Glow
+      g.fillStyle(P[b.c],.35);g.fillCircle(bx,by,11);
+      // Body
+      g.fillStyle(P[b.c],1);g.fillCircle(bx,by,7);
+      // Highlight
+      g.fillStyle(0xffffff,.25);g.fillCircle(bx-1,by-2,3.5);
+      // Ammo bubble
+      g.fillStyle(0xffffff,1);g.fillRoundedRect(bx-11,by-24,22,14,7);
+      let t=this.add.text(bx,by-14,''+(b.a||1),{fontSize:'10px',fontWeight:'bold',color:'#111'}).setOrigin(.5);
+      this._tmp.push(t);
     });
-    
-    // Hit lines
-    this.hitGfx.clear();
-    S.belt.forEach(b=>{
-      if(b.impact&&b.impact>0){
-        b.impact-=16;
-        this.hitGfx.lineStyle(2,PAL[b.c],.6);
-        this.hitGfx.beginPath();this.hitGfx.moveTo(b.fx,b.fy);this.hitGfx.lineTo(b.tx,b.ty);this.hitGfx.strokePath();
-        this.hitGfx.fillStyle(0xffffff,1);this.hitGfx.fillCircle(b.tx,b.ty,3);
-      }
+  }
+  
+  updateUI(){
+    // Slots
+    this.slGs.forEach((s,i)=>{
+      s.setFillStyle(S.sl[i]?P[S.sl[i].c]:GBG,.7);
+      if(S.sl[i]){s.setStrokeStyle(2,BELT_A,.6);}
     });
-    
-    // Update UI
-    this.updateSlots();
-    this.updateSupply();
-    
-    // Check win
-    let won=true;
-    for(let r of S.grid)for(let v of r)if(v>=0){won=false;break}
-    if(won && !this._won){
-      this._won=true;
-      S.com[S.lv]=true;S.coins+=10;sv();
-      this.time.delayedCall(800,()=>{this.scene.restart();S.lv=Math.min(S.lv+1,49);S.com[S.lv]=true;sv();});
+    // Capsules
+    this.cpGs.forEach(e=>{let n=S.am[e.ci]||0;e.lt.setText(''+n);e.at.setText(''+n);e.cap.setAlpha(n<=0?.08:1);});
+    this.beltCountTxt.setText(S.belt.length+'/'+BM+(S.belt.length>=BM?' ⚠':''));
+    this.cnTxt.setText('🪙 '+S.cn);
+  }
+  
+  ts(ci){
+    if(!S.am[ci]||S.am[ci]<=0)return;
+    if(S.belt.length>=BM){this.hintTxt.setText('⚠ BAND VOLL! WARTE...');this.time.delayedCall(1500,()=>this.hintTxt.setText('FARBE ANTIPPEN → HASE AUFS BAND'));return}
+    S.am[ci]--;S.belt.push({c:ci,a:Math.max(1,S.am[ci]),p:Math.random()*.06,cd:0});sh();this.hintTxt.setText('🐰 HASE AUF DEM BAND');
+  }
+  
+  undo(){if(!S.hi.length)return;let p=S.hi.pop();S.g=p.g;S.am=p.am;S.belt=p.belt;S.sl=p.sl;
+    // Rebuild grid visuals
+    for(let r=0;r<this.sz;r++)for(let c=0;c<this.sz;c++)this.cs[r][c].setFillStyle(S.g[r][c]>=0?P[S.g[r][c]]:GBG);
+    this.updateUI();
+  }
+  
+  reset(){this.done=false;let lv=LVS[S.lv];S.g=lv.g.map(r=>[...r]);S.am={};Object.entries(lv.am).forEach(([c,n])=>S.am[c]=n);S.belt=[];S.sl=[null,null,null,null,null];S.hi=[];this.scene.restart();}
+  
+  checkWin(){
+    let ok=true;for(let r of S.g)for(let v of r)if(v>=0){ok=false;break}
+    if(ok&&!this.done){this.done=true;S.cm[S.lv]=true;S.cn+=10;sv();
+      // All cells empty flash
+      for(let r=0;r<this.sz;r++)for(let c=0;c<this.sz;c++){this.cs[r][c].setFillStyle(0x43a047);this.time.delayedCall(300,()=>this.cs[r][c].setFillStyle(GBG));}
+      this.hintTxt.setText('🎉 GESCHAFFT! +10 🪙');
+      let n=S.lv+1;this.time.delayedCall(1500,()=>{if(n>=60)this.scene.start('menu');else{S.lv=n;this.scene.restart();this.scene.start('game');}});
     }
-  }
-  
-  updateSlots(){
-    this.slotBtns.forEach((sl,i)=>{
-      sl.setFillStyle(S.slots[i]?PAL[S.slots[i].c]:GRID_BG,.5);
-    });
-  }
-  
-  updateSupply(){
-    this.supBtns.forEach(sb=>{
-      let n=S.ammo[sb.ci]||0;
-      sb.label.setText(''+n);
-      sb.ammotag.setText(''+n);
-      sb.cap.setAlpha(n<=0?.15:1);
-    });
-  }
-  
-  tapSupply(ci){
-    if(!S.ammo[ci]||S.ammo[ci]<=0)return;
-    if(S.belt.length>=BELT_MAX)return;
-    S.ammo[ci]--;S.belt.push({c:ci,a:S.ammo[ci]>0?S.ammo[ci]+1:1,pos:Math.random()*.1,cd:0});
-    saveH();
-  }
-  
-  tapSlot(i){let s=S.slots[i];if(!s)return;if(S.belt.length>=BELT_MAX)return;S.belt.push({c:s.c,a:s.a,pos:Math.random()*.1,cd:0});S.slots[i]=null;saveH();}
-  
-  goMenu(){this._won=false;this.scene.start('menu');}
-  reset(){
-    let lvl=PATTERNS[S.lv];
-    S.grid=lvl.p.map(r=>[...r]);
-    S.ammo={};Object.entries(lvl.ammo).forEach(([c,n])=>{S.ammo[c]=n;});
-    S.belt=[];S.slots=[null,null,null,null,null];S.hist=[];
-    this._won=false;this.scene.restart();
   }
 }
 
-function saveH(){S.hist.push({g:S.grid.map(r=>[...r]),ammo:{...S.ammo},belt:S.belt.map(b=>({c:b.c,a:b.a,pos:b.pos,cd:b.cd})),slots:[...S.slots]});if(S.hist.length>20)S.hist.shift();}
-
-class MenuScene extends Phaser.Scene {
-  constructor(){super('menu');}
-  create(){
-    this.cameras.main.setBackgroundColor(BG);
-    this.add.text(this.scale.width/2,60,'PIXEL FLOW',{fontSize:'24px',fontWeight:'bold',color:'#ce93d8'}).setOrigin(.5);
-    
-    let best=0;
-    for(let i=49;i>=0;i--){if(S.com[i]){best=i;break}}
-    let nxt=Math.min(best+1,49);
-    
-    for(let i=0;i<30;i++){
-      let x=40+(i%6)*55,y=100+Math.floor(i/6)*55;
-      let done=S.com[i],locked=i>0&&!S.com[i-1]&&!done;
-      let col=done?0x43a047:locked?0x333344:((i===nxt&&!done)?0x2196f3:0x7b1fa2);
-      let node=this.add.circle(x+22,y+22,18,col);
-      if(i===nxt&&!done){
-        this.tweens.add({targets:node,scaleX:1.2,scaleY:1.2,yoyo:true,duration:800,repeat:-1});
-      }
-      this.add.text(x+22,y+22,''+ (i+1),{fontSize:'12px',fontWeight:'bold',color:'#fff'}).setOrigin(.5);
-      if(!locked){
-        node.setInteractive();
-        node.on('pointerdown',()=>{S.lv=i;this.scene.start('main');});
-      }
-    }
-    
-    let play=this.add.rectangle(this.scale.width/2,this.scale.height-60,220,50,0xffd700).setStrokeStyle(3,0x000000);
-    play.setInteractive();
-    play.on('pointerdown',()=>{S.lv=nxt;this.scene.start('main');});
-    this.add.text(this.scale.width/2,this.scale.height-60,'▶ SPIELEN',{fontSize:'18px',fontWeight:'bold',color:'#000'}).setOrigin(.5);
-  }
-}
-
-const config={
-  type:Phaser.CANVAS,
-  width:Math.min(window.innerWidth,420),
-  height:window.innerHeight,
-  parent:document.body,
-  backgroundColor:BG,
-  scene:[MenuScene,MainScene],
-  banner:false,
-};
-new Phaser.Game(config);
+new Phaser.Game({
+  type:Phaser.CANVAS,width:Math.min(window.innerWidth,440),height:window.innerHeight,
+  backgroundColor:BG,scene:[MenuS,GameS],banner:false,
+  scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH}
+});
 </script>
 </body>
 </html>
